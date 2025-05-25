@@ -1,5 +1,5 @@
-import Footer from '@/components/footer';
-import Header from '@/components/header';
+import Footer from '@/components/footer/footer';
+import Header from '@/components/header/header';
 
 const AppLayout = (props: { children?: JSX.Element }) => {
   return (

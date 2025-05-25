@@ -1,7 +1,7 @@
 import { RouteObject, useRoutes } from 'react-router-dom';
 import { ROUTES } from '../constants/endpoint';
 import App from '../pages/App';
-import NotFound from '../pages/notFound';
+import NotFound from '../pages/notFound/MissingPage';
 
 const allRoutes: RouteObject[] = [
   {

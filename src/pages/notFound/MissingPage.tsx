@@ -1,4 +1,4 @@
-import AppLayout from '@/layout/AppLayout';
+import AppLayout from '@/layout/AppLayout/AppLayout';
 
 const NotFound = () => {
   return (
