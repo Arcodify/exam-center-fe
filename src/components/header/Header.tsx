@@ -1,13 +1,10 @@
 import React from 'react';
 import logo from '/logo/ExamOrgLogo.png';
-import { HeaderProps } from './headerProps.types';
+import { useHeaderContext } from './HeaderContext';
 
-const Header: React.FC<HeaderProps> = ({
-  date = '2025/05/20 Tuesday',
-  examTime = '7:30am to 8:30 am',
-  location = 'Babarmahal, Kathmandu',
-  organizer = 'NEPAL HEALTH PROFESSIONAL COUNCIL',
-}) => {
+const Header: React.FC = () => {
+  const { date, examTime, location, organizer } = useHeaderContext();
+
   return (
     <header className="bg-blue-900 text-white py-3 px-6 flex justify-between items-center">
       <div className="flex items-center">
