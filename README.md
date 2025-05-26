@@ -1,36 +1,30 @@
-# Vitejs + React + TypeScript + Tailwind CSS + Tanstack Query Boilerplate
+<H1 align ="center" > Exam FE REACT</h1>
+<h5  align ="center"> 
+<br/>
 
-## This repository is 🔋 battery packed with:
+## Configuration and Setup
 
-- ⚡️ Vite js
-- ⚛️ React 18
-- ✨ TypeScript
-- 💨 Tailwind CSS 4
-- 🦀 Tanstack Query
-- 🌐 Axios
+In order to run this project locally, simply fork and clone the repository or download as zip and unzip on your machine.
 
-### Setup Project
+- Open the project in your prefered code editor.
+- Go to terminal -> New terminal (If you are using VS code)
 
-```
-npm i
-```
-
-### Run local server
+In the first terminal
 
 ```
-npm start
-```
-
-### Build Application
-
-```
-npm run build
-```
-
-### ENV
-
-Please include a .env in the root folder in below format
+$ cd 
+$ npm install 
+$ npm run dev / pnpm dev 
 
 ```
-VITE_API_BASE_URL='http://localhost/api'
+
 ```
+# .env  ---
+
+BASE_URL=http://192.168.1.66:5173
+BACKEND_URL=http://192.168.1.66/aeirc/exam/api/
+REACT_APP_COMPANY_NAME=YourCompanyName
+COMPANY_LOGO=
+VITE_EXAM_NAME=TEST
+VITE_DEV_BACKEND_URL=http://localhost/aeirc/exam/api
+VITE_PROD_BACKEND_URL=https://examportal.aeirc.tech/api
