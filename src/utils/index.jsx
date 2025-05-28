@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 
 // utils.js
 export function getTimeByMs(endTime) {
@@ -69,4 +68,27 @@ export function getRemainingTime() {
   const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
 
   return { hours, minutes, seconds, remainingMs };
+}
+
+
+export function useNetworkStatus(interval = 10000) {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const checkOnline = () => {
+      setIsOnline(navigator.onLine);
+    };
+
+    const intervalId = setInterval(checkOnline, interval);
+    window.addEventListener('online', checkOnline);
+    window.addEventListener('offline', checkOnline);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('online', checkOnline);
+      window.removeEventListener('offline', checkOnline);
+    };
+  }, [interval]);
+
+  return isOnline;
 }

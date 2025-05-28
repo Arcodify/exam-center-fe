@@ -1,19 +1,6 @@
 import axios from "axios";
 import { create } from "zustand";
-
-// Define backend URLs for different environments
-// const DEV_BACKEND_URL = "http://localhost/aeirc/exam/api"; // Development API
-const DEV_BACKEND_URL = import.meta.env.VITE_DEV_BACKEND_URL;
-const PROD_BACKEND_URL = import.meta.env.VITE_PROD_BACKEND_URL;
-
-const BASE_URL =
-  import.meta.env.MODE === "development"
-    ? DEV_BACKEND_URL
-    : PROD_BACKEND_URL || DEV_BACKEND_URL;
-
-const api = axios.create({
-  baseURL: BASE_URL,
-});
+import api from "./api";
 
 // Helper function to get the access token from localStorage
 function getToken() {
