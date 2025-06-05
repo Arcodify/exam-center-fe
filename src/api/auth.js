@@ -3,7 +3,7 @@ import api from "./api";
 
 export const handleLoginpro = async (email, password) => {
   try {
-    const response = await api.post(`/auth/login`, {
+    const response = await api.post(`/auth/login/student/`, {
       email,
       password,
     });

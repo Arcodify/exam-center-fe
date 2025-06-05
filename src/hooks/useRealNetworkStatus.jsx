@@ -9,7 +9,7 @@ export function useRealNetworkStatus(interval = 10000) {
     const checkConnection = async () => {
       try {
         // Replace this with your actual lightweight API route
-        await api.get('/', { timeout: 5000 });
+        await api.get('/exam/session/', { timeout: 5000 });
         setIsOnline(true);
       } catch (error) {
         setIsOnline(false);

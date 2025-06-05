@@ -16,7 +16,7 @@ function getToken() {
 export async function fetchQuestionsFromApi(shiftPlanProgramId) {
   try {
     const token = getToken();
-    const response = await api.get("/question/list", {
+    const response = await api.get("/exam/questions/", {
       headers: { Authorization: `Bearer ${token}` },
       params: { shift_plan_program_id: shiftPlanProgramId ?? 0 },
     });
@@ -36,9 +36,9 @@ export async function fetchQuestionsFromApi(shiftPlanProgramId) {
 export async function fetchQuestionById(questionId) {
   try {
     const token = getToken();
-    const response = await api.get("/question/detail", {
+    const response = await api.get("/exam/question/", {
       headers: { Authorization: `Bearer ${token}` },
-      params: { question_id: questionId },
+      params: { page: questionId },
     });
     return response.data;
   } catch (error) {
