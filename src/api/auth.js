@@ -4,7 +4,7 @@ import api from "./api";
 export const handleLoginpro = async (email, password) => {
   try {
     const response = await api.post(`/login/student/`, {
-      email,
+      symbol_number,
       password,
     });
 
