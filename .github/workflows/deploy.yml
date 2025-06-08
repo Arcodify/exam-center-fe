@@ -21,5 +21,5 @@ jobs:
           ssh-keyscan -H ${{ secrets.FE_DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy Frontend
-        run: ssh -i ~/.ssh/id_rsa ${{ secrets.FE_DEPLOY_USER }}@${{ secrets.FE_DEPLOY_HOST }} "bash /home/deploy/frontend/fe-deploy.sh"
+        run: ssh -i ~/.ssh/id_rsa ${{ secrets.FE_DEPLOY_USER }}@${{ secrets.FE_DEPLOY_HOST }} "bash /home/deploy/fe-deploy.sh"
 
