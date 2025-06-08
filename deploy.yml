@@ -1,0 +1,25 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.FE_DEPLOY_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.FE_DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Frontend
+        run: ssh -i ~/.ssh/id_rsa ${{ secrets.FE_DEPLOY_USER }}@${{ secrets.FE_DEPLOY_HOST }} "bash /home/deploy/frontend/fe-deploy.sh"
+
