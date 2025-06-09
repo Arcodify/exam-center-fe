@@ -13,34 +13,14 @@ function getToken() {
 }
 
 // Fetch questions from API
-export async function checkSession() {
-  try {
-    const token = getToken();
-    const response = await api.get("/exam/session/", {
-      headers: { Authorization: `Bearer ${token}` },
-      // params: { shift_plan_program_id: shiftPlanProgramId ?? 0 },
-    });
-    return response.data;
-
-  } catch (error) {
-    const errorMessage = error.response
-      ? error.response.data?.message ||
-        error.response.statusText ||
-        "An error occurred."
-      : error.message || "Network error. Please check your connection.";
-    console.error("Error fetching questions:", errorMessage);
-    throw new Error(errorMessage);
-  }
-}
-export async function fetchQuestionsFromApi() {
+export async function fetchQuestionsFromApi(shiftPlanProgramId) {
   try {
     const token = getToken();
     const response = await api.get("/exam/questions/", {
       headers: { Authorization: `Bearer ${token}` },
-      // params: { shift_plan_program_id: shiftPlanProgramId ?? 0 },
+      params: { shift_plan_program_id: shiftPlanProgramId ?? 0 },
     });
     return response.data;
-
   } catch (error) {
     const errorMessage = error.response
       ? error.response.data?.message ||
@@ -56,7 +36,7 @@ export async function fetchQuestionsFromApi() {
 export async function fetchQuestionById(questionId) {
   try {
     const token = getToken();
-    const response = await api.get("/exam/questions/", {
+    const response = await api.get("/exam/question/", {
       headers: { Authorization: `Bearer ${token}` },
       params: { page: questionId },
     });

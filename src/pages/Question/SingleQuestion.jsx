@@ -41,10 +41,10 @@ function SingleQuestion() {
         const user = JSON.parse(localStorage.getItem("user"));
         const shiftPlanProgramId = user?.data?.shift_plan_program_id;
 
-        const allQuestionsResponse = await fetchQuestionsFromApi(
-          shiftPlanProgramId
-        );
+        const allQuestionsResponse = await fetchQuestionsFromApi();
         if (allQuestionsResponse?.data) {
+          console.log("he", allQuestionsResponse.data)
+          
           const questionsWithSerial = allQuestionsResponse.data.map(
             (question, index) => ({
               ...question,
@@ -52,7 +52,6 @@ function SingleQuestion() {
             })
           );
           setQuestionsAll(questionsWithSerial);
-
           const answeredSet = new Set(
             questionsWithSerial
               .filter((q) => q.student_answer)
@@ -70,7 +69,7 @@ function SingleQuestion() {
     };
     fetchAllQuestions();
   }, []);
-
+console.log(questions, questionsAll)
   const fetchSingleQuestion = async () => {
     if (firstLoad) {
       setLoading(true);

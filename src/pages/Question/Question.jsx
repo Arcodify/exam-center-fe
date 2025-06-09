@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AnimateProvider from "../../components/AnimateProvider/AnimateProvider";
-import { fetchQuestionsFromApi } from "../../api/question";
+import { checkSession } from "../../api/question";
 import { formatTime } from "../../utils";
 
 function Question() {
@@ -29,8 +29,9 @@ function Question() {
         throw new Error("Invalid Shift Plan Program ID");
       }
       
-      const response = await fetchQuestionsFromApi(shiftPlanProgramId);
+      const response = await checkSession();
       if (response.status === 200) {
+
         setQuestionData(response.data);
         setError(null);
         navigate(`/question/1`);
@@ -44,6 +45,29 @@ function Question() {
       setError(err.response?.data?.error || "Failed to load questions");
     }
   };
+
+  // const handleStartExam = async () => {
+  //   try {
+  //     var shiftPlanProgramId = userInfo?.data?.shift_plan_program_id;
+  //     if (!shiftPlanProgramId) {
+  //       throw new Error("Invalid Shift Plan Program ID");
+  //     }
+      
+  //     const response = await fetchQuestionsFromApi(shiftPlanProgramId);
+  //     if (response.status === 200) {
+  //       setQuestionData(response.data);
+  //       setError(null);
+  //       navigate(`/question/1`);
+  //     } else if (response.status === 422) {
+  //       setError(response.error || "Exam has not started yet. Please check back later.");
+  //       alert(response.error || "Exam has not started yet. Please check back later.");
+  //     } else {
+  //       setError("Something Went wrong . Please Try Again");
+  //     }
+  //   } catch (err) {
+  //     setError(err.response?.data?.error || "Failed to load questions");
+  //   }
+  // };
 
   return (
     <AnimateProvider className="max-w-3xl mx-auto">

@@ -21,7 +21,7 @@ function Navbar() {
       if (!userInfo) {
         fetchUser();
       }
-    }, 20000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);
