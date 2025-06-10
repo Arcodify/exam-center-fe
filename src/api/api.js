@@ -5,6 +5,7 @@ import APP_URI from "../config/apiBaseUrl";
 const api = axios.create({
   baseURL: APP_URI,
   timeout: 10000,
+  withCredentials: true,
 });
 
 // Optional: Add token automatically (can be done with interceptors if preferred)
