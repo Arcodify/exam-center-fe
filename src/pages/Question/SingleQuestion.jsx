@@ -110,32 +110,6 @@ function SingleQuestion() {
     }
   }, [retrying]);
 
-  // const handleClick = async (value) => {
-  //   if (!questions[0]) return;
-
-  //   const questionData = questionsAll.find(
-  //     (q) => q.serialNumber === questionId
-  //   );
-  //   const elapsedTime = getElapsedTime();
-
-  //   const result = await submitAnswer({
-  //     questionId: questionData.id,
-  //     answer: value.answer,
-  //     elapsedTime: elapsedTime,
-  //   });
-
-  //   if (result.success) {
-  //     setAnsweredQuestions((prev) => new Set(prev).add(questionId));
-
-  //     const updatedQuestions = questions.map((q) =>
-  //       q.id === questionData.id ? { ...q, student_answer: value.answer } : q
-  //     );
-
-  //     setQuestions(updatedQuestions);
-  //   } else {
-  //     console.error(result.message);
-  //   }
-  // };
   const handleClick = async (value) => {
     if (!questions[0]) return;
 
