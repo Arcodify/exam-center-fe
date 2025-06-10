@@ -58,7 +58,7 @@ export async function fetchQuestionById(questionId) {
     const token = getToken();
     const response = await api.get("/exam/questions/", {
       headers: { Authorization: `Bearer ${token}` },
-      params: { page: questionId },
+      page: questionId ,
     });
     return response.data;
   } catch (error) {
