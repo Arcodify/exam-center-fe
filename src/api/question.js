@@ -35,7 +35,7 @@ export async function checkSession() {
 export async function fetchQuestionsFromApi() {
   try {
     const token = getToken();
-    const response = await api.get("/exam/questions/", {
+    const response = await api.get("/exam/list/questions/", {
       headers: { Authorization: `Bearer ${token}` },
       // params: { shift_plan_program_id: shiftPlanProgramId ?? 0 },
     });
