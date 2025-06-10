@@ -51,9 +51,9 @@ const router = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <NetworkStatusWrapper>
+      {/* <NetworkStatusWrapper> */}
         <RouterProvider router={router} />
-      </NetworkStatusWrapper>
+      {/* </NetworkStatusWrapper> */}
     </QueryClientProvider>
   </React.StrictMode>
 );

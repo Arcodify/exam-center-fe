@@ -8,7 +8,7 @@ import useQuestionStore from "./store/zustand";
 function App() {
   const [type, setType] = useState(Types[0].id);
   const [level, setLevel] = useState(Level[0]);
-  const { question } = useQuestionStore();
+  // const { question } = useQuestionStore();
   const navigate = useNavigate();
 
   const handleBegin = () => {
