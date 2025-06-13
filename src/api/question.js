@@ -56,7 +56,7 @@ export async function fetchQuestionsFromApi() {
 export async function fetchQuestionById(questionId) {
   try {
     const token = getToken();
-    const response = await api.get("/exam/questions/", {
+    const response = await api.get("/exam/questions", {
       headers: { Authorization: `Bearer ${token}` },
       params: {page: questionId },
     });
@@ -73,12 +73,12 @@ export async function fetchQuestionById(questionId) {
 }
 
 // Submit an answer for a question
-export async function submitAnswer({ questionId, answer, elapsedTime }) {
+export async function submitAnswer({ questionId, answer }) {
   try {
     const token = getToken();
     const response = await api.post(
-      "/question/store",
-      { question_id: questionId, answer, elapsedTime },
+      "/exam/answer/submit/",
+      { question_id: questionId, selected_answer:answer },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -87,8 +87,26 @@ export async function submitAnswer({ questionId, answer, elapsedTime }) {
     } else {
       throw new Error("Failed to submit answer");
     }
-  } catch (error) {
+  } catch (error) { 
     console.error("Error submitting answer:", error.response || error.message);
+    return { success: false, message: error.message || "An error occurred" };
+  }
+}
+export async function endSession({ }) {
+  try {
+    const token = getToken();
+    const response = await api.post(
+      "/exam/session/end/",
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (response.status >= 200 && response.status < 300) {
+      return { success: true, message: "Exam submitted successfully" };
+    } else {
+      throw new Error("Failed to submit answer");
+    }
+  } catch (error) { 
+    console.error("Error submitting Exam:", error.response || error.message);
     return { success: false, message: error.message || "An error occurred" };
   }
 }

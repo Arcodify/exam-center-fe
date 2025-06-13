@@ -47,9 +47,11 @@ function Success() {
         Your responses have been recorded successfully.
       </p>
 
-    <div className="result-container">
+    {/* <div className="result-container">
       <ReportCard/>
-    </div>
+    </div> */}
+
+    
       {/* Render all questions in read-only mode */}
       {/* <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg">
         {staticQuestions.map((question, index) => (

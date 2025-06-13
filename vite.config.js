@@ -9,7 +9,6 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@tanstack/react-query'],
-
   },
   build: {
     rollupOptions: {
