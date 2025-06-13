@@ -9,7 +9,12 @@ import {
   submitAnswer,
 } from "../../api/question";
 import { getElapsedTime } from "../../utils";
-import { FaArrowAltCircleLeft, FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight, FaRegCheckSquare } from "react-icons/fa";
+import {
+  FaArrowAltCircleLeft,
+  FaRegArrowAltCircleLeft,
+  FaRegArrowAltCircleRight,
+  FaRegCheckSquare,
+} from "react-icons/fa";
 
 function SingleQuestion() {
   const navigate = useNavigate();
@@ -41,10 +46,10 @@ function SingleQuestion() {
         const user = JSON.parse(localStorage.getItem("user"));
         const shiftPlanProgramId = user?.data?.shift_plan_program_id;
 
-        const allQuestionsResponse = await fetchQuestionsFromApi(
-          shiftPlanProgramId
-        );
+        const allQuestionsResponse = await fetchQuestionsFromApi();
         if (allQuestionsResponse?.data) {
+          console.log(allQuestionsResponse.data);
+
           const questionsWithSerial = allQuestionsResponse.data.map(
             (question, index) => ({
               ...question,
@@ -109,41 +114,94 @@ function SingleQuestion() {
       return () => clearTimeout(retryTimeout);
     }
   }, [retrying]);
-
   const handleClick = async (value) => {
     if (!questions[0]) return;
-
-    const questionData = questionsAll.find(
-      (q) => q.serialNumber === questionId
-    );
+  
+    const currentQuestion = questions[0]; // this is already the loaded question
     const elapsedTime = getElapsedTime();
-
+  
     const result = await submitAnswer({
-      questionId: questionData.id,
+      questionId: currentQuestion.data.id, // ✅ correct backend ID
       answer: value.answer,
-      elapsedTime: elapsedTime,
     });
-
+  
     if (result.success) {
+      // ✅ Update answered questions set
       setAnsweredQuestions((prev) => {
         const updatedSet = new Set(prev);
         if (value.answer === null) {
-          updatedSet.delete(questionId); // Remove from answered set if cleared
+          updatedSet.delete(questionId); // Remove from answered if cleared
         } else {
-          updatedSet.add(questionId); // Add to answered set if answered
+          updatedSet.add(questionId); // Add to answered
         }
         return updatedSet;
       });
-
+  
+      // ✅ Update the question with new student_answer in its `data`
       const updatedQuestions = questions.map((q) =>
-        q.id === questionData.id ? { ...q, student_answer: value.answer } : q
+        q.data.id === currentQuestion.data.id
+          ? {
+              ...q,
+              data: {
+                ...q.data,
+                student_answer: value.answer,
+              },
+            }
+          : q
       );
-
+  
       setQuestions(updatedQuestions);
+  
+      // ✅ Also update `questionsAll` so the pagination reflects updates
+      const updatedQuestionsAll = questionsAll.map((q) =>
+        q.id === currentQuestion.data.id
+          ? {
+              ...q,
+              student_answer: value.answer,
+            }
+          : q
+      );
+  
+      setQuestionsAll(updatedQuestionsAll);
     } else {
       console.error(result.message);
     }
   };
+  
+
+  // const handleClick1 = async (value) => {
+  //   if (!questions[0]) return;
+
+  //   const questionData = questionsAll.find(
+  //     (q) => q.serialNumber === questionId
+  //   );
+  //   const elapsedTime = getElapsedTime();
+
+  //   const result = await submitAnswer({
+  //     questionId: questionData.id,
+  //     answer: value.answer,
+  //   });
+
+  //   if (result.success) {
+  //     setAnsweredQuestions((prev) => {
+  //       const updatedSet = new Set(prev);
+  //       if (value.answer === null) {
+  //         updatedSet.delete(questionId); // Remove from answered set if cleared
+  //       } else {
+  //         updatedSet.add(questionId); // Add to answered set if answered
+  //       }
+  //       return updatedSet;
+  //     });
+
+  //     const updatedQuestions = questions.map((q) =>
+  //       q.id === questionData.id ? { ...q, student_answer: value.answer } : q
+  //     );
+
+  //     setQuestions(updatedQuestions);
+  //   } else {
+  //     console.error(result.message);
+  //   }
+  // };
 
   const handlePrevious = () => {
     if (questionId > 1) {
@@ -212,7 +270,11 @@ function SingleQuestion() {
                     }`}
                   >
                     {questionId === questionsAll.length ? "Submit" : "Next"}
-                    {questionId === questionsAll.length ? <FaRegCheckSquare /> : <FaRegArrowAltCircleRight />}
+                    {questionId === questionsAll.length ? (
+                      <FaRegCheckSquare />
+                    ) : (
+                      <FaRegArrowAltCircleRight />
+                    )}
                   </button>
                 </div>
               </div>
@@ -223,13 +285,13 @@ function SingleQuestion() {
                   <div className="w-full question-summary mb-6 text-s p-2 h-105 bg-gray-100 rounded-lg shadow-md">
                     <div className="flex-col">
                       <div className="p-2 bg-white rounded-lg flex h-50 status justify-between">
-                         <p className="text-md text-gray-700 font-semibold">
+                        <p className="text-md text-gray-700 font-semibold">
                           Total :{" "}
                           <span className="text-xl font-bold text-blue-600">
                             {totalQuestions}
                           </span>
                         </p>
-                        
+
                         <p className="text-md text-green-700 font-semibold">
                           Answered :{" "}
                           <span className="text-xl font-bold">
@@ -242,7 +304,6 @@ function SingleQuestion() {
                             {remainingCount}
                           </span>
                         </p>
-                       
                       </div>
                     </div>
                   </div>
