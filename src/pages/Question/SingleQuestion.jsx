@@ -15,6 +15,7 @@ import {
   FaRegArrowAltCircleRight,
   FaRegCheckSquare,
 } from "react-icons/fa";
+import SocketInitialization from "../../components/socket/socket";
 
 function SingleQuestion() {
   const navigate = useNavigate();
@@ -116,15 +117,15 @@ function SingleQuestion() {
   }, [retrying]);
   const handleClick = async (value) => {
     if (!questions[0]) return;
-  
+
     const currentQuestion = questions[0]; // this is already the loaded question
     const elapsedTime = getElapsedTime();
-  
+
     const result = await submitAnswer({
       questionId: currentQuestion.data.id, // ✅ correct backend ID
       answer: value.answer,
     });
-  
+
     if (result.success) {
       // ✅ Update answered questions set
       setAnsweredQuestions((prev) => {
@@ -136,7 +137,7 @@ function SingleQuestion() {
         }
         return updatedSet;
       });
-  
+
       // ✅ Update the question with new student_answer in its `data`
       const updatedQuestions = questions.map((q) =>
         q.data.id === currentQuestion.data.id
@@ -149,9 +150,9 @@ function SingleQuestion() {
             }
           : q
       );
-  
+
       setQuestions(updatedQuestions);
-  
+
       // ✅ Also update `questionsAll` so the pagination reflects updates
       const updatedQuestionsAll = questionsAll.map((q) =>
         q.id === currentQuestion.data.id
@@ -161,13 +162,12 @@ function SingleQuestion() {
             }
           : q
       );
-  
+
       setQuestionsAll(updatedQuestionsAll);
     } else {
       console.error(result.message);
     }
   };
-  
 
   // const handleClick1 = async (value) => {
   //   if (!questions[0]) return;
@@ -233,6 +233,7 @@ function SingleQuestion() {
 
   return (
     <AnimateProvider>
+      <SocketInitialization />
       {loading && firstLoad && (
         <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex items-center justify-center z-50">
           <div className="text-white text-xl">Loading...</div>
