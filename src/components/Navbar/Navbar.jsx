@@ -80,11 +80,7 @@ function Navbar() {
                 {userInfo?.data?.program?.name || ""}
               </span>
             </h3>
-            {location.pathname.startsWith("/question/") && (
-              <div className="timer">
-                <TimeStamp />
-              </div>
-            )}
+
           </div>
 
           {/* User Profile Picture */}
