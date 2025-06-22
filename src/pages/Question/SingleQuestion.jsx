@@ -7,6 +7,7 @@ import {
   fetchQuestionById,
   fetchQuestionsFromApi,
   submitAnswer,
+  sessionEnd,
 } from "../../api/question";
 import { getElapsedTime } from "../../utils";
 import {
@@ -26,6 +27,7 @@ function SingleQuestion() {
   const [questions, setQuestions] = useState([]);
   const [questionsAll, setQuestionsAll] = useState([]);
   const [answeredQuestions, setAnsweredQuestions] = useState(new Set());
+  const [skippedQuestions, setSkippedQuestions] = useState(new Set());
   const [isModalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [firstLoad, setFirstLoad] = useState(true);
@@ -48,15 +50,20 @@ function SingleQuestion() {
         const shiftPlanProgramId = user?.data?.shift_plan_program_id;
 
         const allQuestionsResponse = await fetchQuestionsFromApi();
-        if (allQuestionsResponse?.data) {
-          console.log(allQuestionsResponse.data);
+        console.log("API Response:", allQuestionsResponse);
 
-          const questionsWithSerial = allQuestionsResponse.data.map(
-            (question, index) => ({
-              ...question,
-              serialNumber: index + 1,
-            })
-          );
+        // Handle both array response and nested data response
+        const questionsData = Array.isArray(allQuestionsResponse)
+          ? allQuestionsResponse
+          : allQuestionsResponse?.data || [];
+
+        if (questionsData.length > 0) {
+          console.log("Questions data:", questionsData);
+
+          const questionsWithSerial = questionsData.map((question, index) => ({
+            ...question,
+            serialNumber: index + 1,
+          }));
           setQuestionsAll(questionsWithSerial);
 
           const answeredSet = new Set(
@@ -66,7 +73,7 @@ function SingleQuestion() {
           );
           setAnsweredQuestions(answeredSet);
         } else {
-          throw new Error("Failed to fetch questions.");
+          throw new Error("No questions found in the response.");
         }
       } catch (err) {
         console.error("Error fetching questions:", err);
@@ -87,8 +94,8 @@ function SingleQuestion() {
         (q) => q.serialNumber === questionId
       );
       if (questionData) {
-        const data = await fetchQuestionById(questionData.id);
-        setQuestions([data]);
+        // Use the question data directly since we already have all questions
+        setQuestions([{ data: questionData }]);
       } else {
         throw new Error("Question not found");
       }
@@ -135,6 +142,13 @@ function SingleQuestion() {
         } else {
           updatedSet.add(questionId); // Add to answered
         }
+        return updatedSet;
+      });
+
+      // ✅ Remove from skipped questions if answered
+      setSkippedQuestions((prev) => {
+        const updatedSet = new Set(prev);
+        updatedSet.delete(questionId);
         return updatedSet;
       });
 
@@ -210,6 +224,18 @@ function SingleQuestion() {
   };
 
   const handleNext = () => {
+    // Check if current question is unanswered and mark as skipped
+    const currentQuestion = questionsAll.find(
+      (q) => q.serialNumber === questionId
+    );
+    if (currentQuestion && !currentQuestion.student_answer) {
+      setSkippedQuestions((prev) => {
+        const updatedSet = new Set(prev);
+        updatedSet.add(questionId);
+        return updatedSet;
+      });
+    }
+
     if (questionId >= questionsAll.length) {
       setModalOpen(true);
     } else {
@@ -217,10 +243,18 @@ function SingleQuestion() {
     }
   };
 
-  const submitQuiz = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("endTime");
-    navigate("/finish");
+  const submitQuiz = async () => {
+    setModalOpen(false);
+    const result = await sessionEnd();
+    console.log(result);
+
+    if (result.success) {
+      setTimeout(() => {
+        navigate("/review");
+      }, 3000);
+    } else {
+      console.error(result.message);
+    }
   };
 
   const handlePagination = (num) => {
@@ -229,7 +263,8 @@ function SingleQuestion() {
 
   const totalQuestions = questionsAll.length;
   const answeredCount = answeredQuestions.size;
-  const remainingCount = totalQuestions - answeredCount;
+  const skippedCount = skippedQuestions.size;
+  const remainingCount = totalQuestions - answeredCount - skippedCount;
 
   return (
     <AnimateProvider>
@@ -262,6 +297,7 @@ function SingleQuestion() {
                     <FaArrowAltCircleLeft />
                     Previous
                   </button>
+
                   <button
                     onClick={handleNext}
                     className={`px-4 py-2 bg-blue-500 text-white rounded ${
@@ -300,6 +336,12 @@ function SingleQuestion() {
                           </span>
                         </p>
                         <p className="text-md text-red-500 font-semibold">
+                          Skipped :{" "}
+                          <span className="text-xl font-bold">
+                            {skippedCount}
+                          </span>
+                        </p>
+                        <p className="text-md text-orange-500 font-semibold">
                           Remaining :{" "}
                           <span className="text-xl font-bold">
                             {remainingCount}
@@ -320,6 +362,7 @@ function SingleQuestion() {
                       const questionNum = index + 1;
                       const isCurrentQuestion = questionId === questionNum;
                       const hasAnswered = answeredQuestions.has(questionNum);
+                      const isSkipped = skippedQuestions.has(questionNum);
 
                       return (
                         <button
@@ -329,14 +372,24 @@ function SingleQuestion() {
                               ${
                                 isCurrentQuestion && hasAnswered
                                   ? "bg-green-600 border-4 border-orange-500 text-white shadow-xl"
+                                  : isCurrentQuestion && isSkipped
+                                  ? "bg-red-600 border-4 border-orange-500 text-white shadow-xl"
                                   : isCurrentQuestion
                                   ? "bg-orange-500 text-white shadow-xl"
                                   : hasAnswered
                                   ? "bg-green-500 text-white shadow-md"
+                                  : isSkipped
+                                  ? "bg-red-500 text-white shadow-md"
                                   : "bg-gray-200 text-gray-700 hover:bg-gray-300 shadow-sm"
                               }
                             `}
-                          title={`Question ${questionNum}`}
+                          title={`Question ${questionNum}${
+                            isSkipped
+                              ? " (Skipped)"
+                              : hasAnswered
+                              ? " (Answered)"
+                              : ""
+                          }`}
                         >
                           {questionNum}
                         </button>

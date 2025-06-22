@@ -21,7 +21,6 @@ export async function checkSession() {
       // params: { shift_plan_program_id: shiftPlanProgramId ?? 0 },
     });
     return response.data;
-
   } catch (error) {
     const errorMessage = error.response
       ? error.response.data?.message ||
@@ -40,7 +39,6 @@ export async function fetchQuestionsFromApi() {
       // params: { shift_plan_program_id: shiftPlanProgramId ?? 0 },
     });
     return response.data;
-
   } catch (error) {
     const errorMessage = error.response
       ? error.response.data?.message ||
@@ -52,13 +50,55 @@ export async function fetchQuestionsFromApi() {
   }
 }
 
+export async function sessionEnd() {
+  try {
+    const token = getToken();
+    
+    const response = await api.post("/exam/session/end/", {},{
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return {
+      success: true,
+      message: "Exam submitted successfully",
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("Error submitting answer:", error.response || error.message);
+      return {
+      success: false,
+      message: error.message || "An error occurred",
+      data: null,
+    };
+  }
+}
+
+export async function fetchReview() {
+  try {
+    const token = getToken();
+    const response = await api.get("/exam/review/", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return {
+      success: true,
+      message: "Exam submitted successfully",
+      data: response.data.data,
+    };
+  } catch (error) {
+    console.error("Error fetching review:", error.response || error.message);
+    return {
+      success: false,
+      message: error.message || "An error occurred",
+      data: null,
+    };
+  }
+}
 // Fetch a question by ID
 export async function fetchQuestionById(questionId) {
   try {
     const token = getToken();
     const response = await api.get("/exam/questions", {
       headers: { Authorization: `Bearer ${token}` },
-      params: {page: questionId },
+      params: { page: questionId },
     });
     return response.data;
   } catch (error) {
@@ -78,7 +118,7 @@ export async function submitAnswer({ questionId, answer }) {
     const token = getToken();
     const response = await api.post(
       "/exam/answer/submit/",
-      { question_id: questionId, selected_answer:answer },
+      { question_id: questionId, selected_answer: answer },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -87,25 +127,24 @@ export async function submitAnswer({ questionId, answer }) {
     } else {
       throw new Error("Failed to submit answer");
     }
-  } catch (error) { 
+  } catch (error) {
     console.error("Error submitting answer:", error.response || error.message);
     return { success: false, message: error.message || "An error occurred" };
   }
 }
-export async function endSession({ }) {
+export async function endSession({}) {
   try {
     const token = getToken();
-    const response = await api.post(
-      "/exam/session/end/",
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const response = await api.post("/exam/session/end/", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (response.status >= 200 && response.status < 300) {
       return { success: true, message: "Exam submitted successfully" };
     } else {
       throw new Error("Failed to submit answer");
     }
-  } catch (error) { 
+  } catch (error) {
     console.error("Error submitting Exam:", error.response || error.message);
     return { success: false, message: error.message || "An error occurred" };
   }

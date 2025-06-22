@@ -7,3 +7,4 @@ export { default as RequireAuth } from "./Require/RequireAuth";
 export { default as RequireLogout } from "./Require/RequireLogout";
 export { default as Success } from "./Success/Success";
 export { default as NotFound } from "./NotFound/NotFound";
+export { default as Review } from "./review/review";
