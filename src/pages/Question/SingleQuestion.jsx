@@ -251,7 +251,7 @@ function SingleQuestion() {
     if (result.success) {
       setTimeout(() => {
         navigate("/review");
-      }, 3000);
+      }, 1000);
     } else {
       console.error(result.message);
     }
