@@ -1,4 +1,5 @@
 import { Idx } from "../../constant";
+import { renderMathText, hasMathExpressions } from "../../utils/mathUtils";
 
 function Option({
   value,
@@ -9,6 +10,8 @@ function Option({
   readOnly,
 }) {
   const isSelected = studentAnswer === answerNumber;
+  const containsMath = hasMathExpressions(value);
+
   if (readOnly == true) {
     return (
       <div
@@ -31,7 +34,13 @@ function Option({
           className="cursor-default"
         />
         <p>{Idx[idx]}.</p>
-        <p>{value}</p>
+        <p>
+          {containsMath ? (
+            <>{renderMathText(value)}</>
+          ) : (
+            value
+          )}
+        </p>
       </div>
     );
   } else {
@@ -59,7 +68,13 @@ function Option({
           readOnly={readOnly}
         />
         <p>{Idx[idx]}.</p>
-        <p>{value}</p>
+        <p>
+          {containsMath ? (
+            <>{renderMathText(value)}</>
+          ) : (
+            value
+          )}
+        </p>
       </div>
     );
   }

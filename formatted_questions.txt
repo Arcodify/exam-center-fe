@@ -1,0 +1,89 @@
+Question 1)
+A body is moving in a circular path with constant speed. Which of the following statements is true?
+
+A) The body has no acceleration
+B) The body has tangential acceleration
+C) The body has centripetal acceleration
+D) The body has both tangential and centripetal acceleration
+Answer: The body has centripetal acceleration
+
+Question 2)
+If $A$ is a square matrix such that $A^2 = I$, then which of the following is true?
+
+A) $A$ is a null matrix
+B) $A$ is an identity matrix
+C) $A$ is an involutory matrix
+D) $A$ is a diagonal matrix
+Answer: $A$ is an involutory matrix
+
+Question 3)
+Which of the following has the highest bond dissociation energy?
+
+A) $O_2$
+B) $N_2$
+C) $F_2$
+D) $Cl_2$
+Answer: $N_2$
+
+Question 4)
+The dimensional formula of resistance is:
+
+A) $MLT^{-3}A^{-2}$
+B) $ML^2T^{-2}A^{-2}$
+C) $ML^2T^{-3}$
+D) $ML^2T^{-3}A$
+Answer: $ML^2T^{-2}A^{-2}$
+
+Question 5)
+The Laplace transform of $\sin(at)$ is:
+
+A) $\frac{a}{s^2 + a^2}$
+B) $\frac{s}{s^2 + a^2}$
+C) $\frac{1}{s - a}$
+D) $\frac{a}{(s - a)^2}$
+Answer: $\frac{a}{s^2 + a^2}$
+
+Question 6)
+Which of the following is not a state function?
+
+A) Internal energy
+B) Enthalpy
+C) Work
+D) Gibbs free energy
+Answer: Work
+
+Question 7)
+In a transformer, the core is laminated to:
+
+A) Reduce hysteresis loss
+B) Reduce eddy current loss
+C) Increase efficiency
+D) Increase resistance
+Answer: Reduce eddy current loss
+
+Question 8)
+The solution of the differential equation $\frac{dy}{dx} + y = e^x$ is:
+
+A) $y = e^x + C$
+B) $y = x + C$
+C) $y = Ce^{-x} + e^x$
+D) $y = Ce^x + x$
+Answer: $y = Ce^{-x} + e^x$
+
+Question 9)
+Which of the following is a Lewis acid?
+
+A) $NH_3$
+B) $H_2O$
+C) $BF_3$
+D) $CH_4$
+Answer: $BF_3$
+
+Question 10)
+The escape velocity from the Earth is approximately:
+
+A) $7.9 \text{ km/s}$
+B) $9.8 \text{ km/s}$
+C) $11.2 \text{ km/s}$
+D) $13.6 \text{ km/s}$
+Answer: $11.2 \text{ km/s}$ 

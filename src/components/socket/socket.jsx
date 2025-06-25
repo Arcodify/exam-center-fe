@@ -318,7 +318,7 @@ function SocketInitialization() {
                               (statusMsg.time_remaining / 3600) * 100
                             )}%`,
                           }}
-                        ></div>
+                        >  </div>
                       </div>
                     </div>
                   )}

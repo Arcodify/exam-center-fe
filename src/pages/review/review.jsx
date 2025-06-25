@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchReview } from "../../api/question";
+import { renderMathText, hasMathExpressions } from "../../utils/mathUtils";
 
 const Review = () => {
   const [review, setReview] = useState(null);
@@ -127,55 +128,75 @@ const Review = () => {
 
         {/* Questions Section */} 
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Q uestions Review</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Questions Review</h2>
           {questions && questions.length > 0 ? (
             <div className="space-y-6">
-              {questions.map((question, index) => (
-                <div key={question.id} className="border border-gray-200 rounded-lg p-6 bg-gray-50">
-                  <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Question {index + 1}
-                    </h3>
-                    <span className="text-sm text-gray-500">ID: {question?.id}</span>
-                  </div>
-                  
-                  <p className="text-gray-700 mb-4 leading-relaxed">{question.question}</p>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-gray-700 mb-3">Options:</h4>
-                    {question.answers.map((answer, answerIndex) => (
-                      <div 
-                        key={answerIndex} 
-                        className={`p-3 rounded-lg border-2 transition-colors ${
-                          question?.student_answer === answer?.answer_number
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-center">
-                          <span className="font-medium text-gray-600 mr-3 min-w-[20px]">
-                            {answer?.answer_number.toUpperCase()}.
-                          </span>
-                          <span className="text-gray-700">{answer?.options}</span>
-                          {question?.student_answer === answer?.answer_number && (
-                            <span className="ml-auto text-blue-600 font-medium">
-                              ✓ Your Answer
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {question.student_answer && (
-                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-blue-700">
-                        <span className="font-medium">Your Answer:</span> {question?.student_answer.toUpperCase()}
-                      </p>
+              {questions.map((question, index) => {
+                const questionContainsMath = hasMathExpressions(question.question);
+
+                return (
+                  <div key={question.id} className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        Question {index + 1}
+                      </h3>
+                      <span className="text-sm text-gray-500">ID: {question?.id}</span>
                     </div>
-                  )}
-                </div>
-              ))}
+                    
+                    <div className="text-gray-700 mb-4 leading-relaxed">
+                      {questionContainsMath ? (
+                        <>{renderMathText(question.question)}</>
+                      ) : (
+                        question.question
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-gray-700 mb-3">Options:</h4>
+                      {question.answers.map((answer, answerIndex) => {
+                        const answerContainsMath = hasMathExpressions(answer.options);
+
+                        return (
+                          <div 
+                            key={answerIndex} 
+                            className={`p-3 rounded-lg border-2 transition-colors ${
+                              question?.student_answer === answer?.answer_number
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 bg-white'
+                            }`}
+                          >
+                            <div className="flex items-center">
+                              <span className="font-medium text-gray-600 mr-3 min-w-[20px]">
+                                {answer?.answer_number.toUpperCase()}.
+                              </span>
+                              <span className="text-gray-700">
+                                {answerContainsMath ? (
+                                  <>{renderMathText(answer.options)}</>
+                                ) : (
+                                  answer?.options
+                                )}
+                              </span>
+                              {question?.student_answer === answer?.answer_number && (
+                                <span className="ml-auto text-blue-600 font-medium">
+                                  ✓ Your Answer
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    {question.student_answer && (
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-blue-700">
+                          <span className="font-medium">Your Answer:</span> {question?.student_answer.toUpperCase()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-8">

@@ -1,34 +1,13 @@
 import { useState, useEffect } from "react";
 import he from "he";
 import Option from "../Option/Option";
-import katex from 'katex';
-import 'katex/dist/katex.min.css'
-import { InlineMath } from "react-katex";
+import { renderMathText, hasMathExpressions } from "../../utils/mathUtils";
 
-function Question({ id, handleClick, singleQuestion , readOnly}) {
+function Question({ id, handleClick, singleQuestion, readOnly }) {
   const [userAnswer, setUserAnswer] = useState(singleQuestion.data.student_answer);
 
   const answers = singleQuestion.data.answers;
   const question = singleQuestion.data.question;
-
-  const InlineMath_1= ({ math }) => {
-    const mathRef = useRef(null);
-  
-    useEffect(() => {
-      if (mathRef.current) {
-        try {
-          katex.render(math, mathRef.current, {
-            throwOnError: false, // Do not throw errors on invalid LaTeX
-          });
-        } catch (error) {
-          console.error('KaTeX Error:', error);
-        }
-      }
-    }, [math]); // Re-run whenever `math` changes
-  
-    return <span ref={mathRef} />;
-  };
-
 
   useEffect(() => {
     setUserAnswer(singleQuestion.data.student_answer);
@@ -43,15 +22,21 @@ function Question({ id, handleClick, singleQuestion , readOnly}) {
     setUserAnswer(null);
     await handleClick({ questionId: id, answer: null });
   };
+
+  // Check if question contains math expressions
+  const containsMath = hasMathExpressions(question);
+
   return (
     <section>
       <div className="flex items-start space-x-3 text-xl mb-10">
         <h3 className="text-gray-800 font-semibold text-center">{id}.</h3>
-        <h3 className="text-gray-800 font-semibold">{he.decode(question)}</h3>
-        {/* <h3 className="text-gray-800 font-semibold">
-          <InlineMath math={`${question}`}/>
-        </h3> */}
-
+        <h3 className="text-gray-800 font-semibold">
+          {containsMath ? (
+            <>{renderMathText(question)}</>
+          ) : (
+            he.decode(question)
+          )}
+        </h3>
       </div>
 
       {answers.map((opt, i) => (
@@ -63,7 +48,7 @@ function Question({ id, handleClick, singleQuestion , readOnly}) {
           handleClick={handleOptionClick}  
           studentAnswer={userAnswer}      
           isSelected={userAnswer === opt.answer_number} 
-          readOnly ={readOnly}
+          readOnly={readOnly}
         />
       ))}
 
