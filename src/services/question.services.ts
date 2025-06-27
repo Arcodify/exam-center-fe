@@ -13,7 +13,7 @@ class QuestionServices {
       return {
         success: false,
         data: null,
-        message: error.response.data.message || "Something went wrong",
+        message: error.response.data.error || "Something went wrong",
       };
     }
   }
@@ -32,7 +32,7 @@ class QuestionServices {
       return {
         success: false,
         data: null,
-        message: error.response.data.message || "Something went wrong",
+        message: error.response.data.error || "Something went wrong",
       };
     }
   }
@@ -49,7 +49,7 @@ class QuestionServices {
       return {
         success: false,
         data: null,
-        message: error.response.data.message || "Something went wrong",
+        message: error.response.data.error || "Something went wrong",
       };
     }
   }

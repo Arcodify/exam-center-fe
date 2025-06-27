@@ -1,6 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import UserPhoto from "@/assets/man.png";
 
 type InstituteData = {
   session_id: number;
@@ -13,6 +14,7 @@ type InstituteData = {
   isValidated: boolean;
   isLoadingInstitute: boolean;
 };
+
 const Dashboard = () => {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [instituteData, setInstituteData] = useState<InstituteData | null>(
@@ -31,134 +33,211 @@ const Dashboard = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex items-center gap-2 text-slate-600">
+          <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+          <span className="text-sm font-medium">Loading...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center justify-start font-sans">
-      <div className="w-full max-w-3xl bg-white rounded-xl shadow-md p-6 space-y-6">
-        {instituteData && (
-          <div className="flex items-center justify-center gap-2">
-            <img
-              src={
-                instituteData.institute_logo ? instituteData.institute_logo : ""
-              }
-              width={400}
-              height={400}
-              alt="institite logo"
-              className={`w-22 h-22 rounded-full`}
-            />
-            <p className="">{instituteData.institute_name}</p>
-          </div>
-        )}
-
-        {/* Header with Logout */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">Welcome</h1>
-        </div>
-
-        {/* User Info */}
-        <div className=" flex justify-between gap-4 items-start  ">
-          <div className="space-y-1 text-gray-700 text-base leading-6">
-            <p>
-              <span className="font-semibold">Symbol Number:</span>{" "}
-              {user?.symbol_number}
-            </p>
-            <p>
-              <span className="font-semibold">Name:</span> {user?.name}
-            </p>
-            <p>
-              <span className="font-semibold">Email:</span> {user?.email}
-            </p>
-            <p>
-              <span className="font-semibold">Program:</span>{" "}
-              {user?.program?.name || "Not available"}
-            </p>
-            <p>
-              <span className="font-semibold">Level:</span>{" "}
-              {user?.level?.name || "Not available"}
-            </p>
-            <p>
-              <span className="font-semibold">Exam duration:</span>{" "}
-              {formatTime(Number(user?.duration))}
-            </p>
-          </div>
-
-          <div className="flex justify-center items-center gap-4">
-            <div>
-              <img
-                src={
-                  user.photo ||
-                  "https://t4.ftcdn.net/jpg/02/24/86/95/360_F_224869519_aRaeLneqALfPNBzg0xxMZXghtvBXkfIA.jpg"
-                }
-                alt="Student"
-                className="w-40 h-32 rounded-xl object-cover border-2 border-white shadow-md"
-              />
+    <div className="min-h-screen bg-slate-50 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
+        {/* Main Card */}
+        <div className="bg-white border border-slate-200 rounded-lg shadow-sm">
+          {/* Header */}
+          <div className="px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="">
+              <h1 className="text-xl font-semibold text-slate-900">
+                Exam Dashboard
+              </h1>
+              <p className="text-sm text-slate-600 mt-1">
+                Welcome back, {user?.name}
+              </p>
             </div>
-            <div>
-              <img
-                src={
-                  user.photo ||
-                  "https://t4.ftcdn.net/jpg/02/24/86/95/360_F_224869519_aRaeLneqALfPNBzg0xxMZXghtvBXkfIA.jpg"
-                }
-                alt="Student"
-                className="w-40 h-32 rounded-xl object-cover border-2 border-white shadow-md"
-              />
+
+            {instituteData && (
+              <div className="text-center">
+                <div className="flex md:flex-row-reverse items-center gap-4 mt-6  md:mt-0">
+                  <img
+                    src={instituteData.institute_logo || ""}
+                    width={48}
+                    height={48}
+                    alt="Institute logo"
+                    className="w-10 h-10 rounded-full object-cover border border-slate-200"
+                  />
+                  <h2 className="text-sm text-slate-500 font-semibold">
+                    {instituteData.institute_name}
+                  </h2>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="p-6 space-y-6">
+            {/* Student Information */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-4">
+                <h3 className="text-sm font-medium text-slate-900 uppercase tracking-wide">
+                  Student Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-slate-500">Symbol Number</span>
+                      <p className="font-medium text-slate-900">
+                        {user?.symbol_number}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Name</span>
+                      <p className="font-medium text-slate-900">{user?.name}</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Email</span>
+                      <p className="font-medium text-slate-900">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-slate-500">Program</span>
+                      <p className="font-medium text-slate-900">
+                        {user?.program?.name || "Not available"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Level</span>
+                      <p className="font-medium text-slate-900">
+                        {user?.level?.name || "Not available"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Duration</span>
+                      <p className="font-medium text-slate-900">
+                        {formatTime(Number(user?.duration))}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Student Photos */}
+              <div className="flex flex-col lg:items-center gap-3">
+                <div className="lg:text-center">
+                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                    Student Photo
+                  </span>
+                </div>
+                <img
+                  src={user.photo || UserPhoto}
+                  alt="Student"
+                  className="w-24 h-24 rounded-lg object-cover border border-slate-200"
+                />
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-slate-900 uppercase tracking-wide">
+                Exam Instructions
+              </h3>
+              <div className="bg-slate-50 rounded-lg p-4">
+                <ul className="space-y-2 text-sm text-slate-700">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>
+                      Please read the following instructions carefully before
+                      proceeding
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>
+                      This exam consists of questions designed to test your
+                      understanding
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>
+                      You will have a set amount of time to complete the exam
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>
+                      Ensure you are in a quiet environment free from
+                      distractions
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Review your answers carefully before submitting</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Terms and Start Button */}
+            <div className="space-y-4 pt-2">
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={isTermsAccepted}
+                    onChange={() => setIsTermsAccepted(!isTermsAccepted)}
+                  />
+                  <div
+                    className={`w-4 h-4 border-2 rounded transition-all ${
+                      isTermsAccepted
+                        ? "bg-orange-600 border-orange-600"
+                        : "border-slate-300 group-hover:border-slate-400"
+                    }`}
+                  >
+                    {isTermsAccepted && (
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <span className="text-sm text-slate-700 leading-relaxed">
+                  I accept the terms and conditions of the exam and understand
+                  all the instructions provided above.
+                </span>
+              </label>
+
+              <button
+                type="button"
+                disabled={!isTermsAccepted}
+                onClick={() => navigate("/questions")}
+                className={`w-full py-3 px-4 rounded-lg font-medium text-sm transition-all cursor-pointer disabled:cursor-not-allowed ${
+                  isTermsAccepted
+                    ? "bg-orange-600 hover:bg-orange-700 text-white shadow-sm"
+                    : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                }`}
+              >
+                {isTermsAccepted
+                  ? "Start Exam"
+                  : "Please accept the terms and conditions"}
+              </button>
             </div>
           </div>
         </div>
-        {/* Instructions */}
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-800">Instructions</h3>
-          <ul className="list-disc list-inside text-gray-700 space-y-1">
-            <li>
-              Please read the following instructions carefully before
-              proceeding:
-            </li>
-            <li>This exam consists of questions.</li>
-            <li>
-              Each question is designed to test your understanding of the
-              material.
-            </li>
-            <li>You will have a set amount of time to complete the exam.</li>
-            <li>
-              Please ensure that you are in a quiet environment free from
-              distractions.
-            </li>
-            <li>Make sure to review your answers before submitting.</li>
-          </ul>
-        </div>
-
-        {/* Terms and Conditions */}
-        <div className="pt-4">
-          <label className="flex items-center gap-2 text-gray-700">
-            <input
-              type="checkbox"
-              className="accent-blue-600 w-4 h-4"
-              checked={isTermsAccepted}
-              onChange={() => setIsTermsAccepted(!isTermsAccepted)}
-            />
-            <span>I accept the terms and conditions of the exam.</span>
-          </label>
-        </div>
-
-        <button
-          type="submit"
-          disabled={!isTermsAccepted}
-          onClick={() => navigate("/questions")}
-          className={`w-full mt-2 py-2 px-4 bg-orange-500  text-white font-semibold rounded-md hover:bg-orange-600 transition ${
-            !isTermsAccepted
-              ? "opacity-60 cursor-not-allowed"
-              : "cursor-pointer"
-          }`}
-        >
-          {isTermsAccepted
-            ? "Start Exam"
-            : "Please accept the terms and conditions"}
-        </button>
       </div>
     </div>
   );

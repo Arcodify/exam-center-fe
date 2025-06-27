@@ -81,19 +81,21 @@ function LoginForm() {
         const res = await axiosPublic.get("/initial/info");
         const data = await res.data;
 
+        console.log(res);
+        if (!data) throw new Error("No data was found");
+
         setInitialInstituteData((prev) => ({
           ...prev,
-          data,
-          image: null,
+          ...data,
           isValidated: true,
         }));
 
-        console.log(await res.data);
         sessionStorage.setItem("institute-data", JSON.stringify(data));
       } catch (error: any) {
-        console.error(error.message);
         setInitialInstituteData((prev) => ({ ...prev, isValidated: false }));
-        toast.error("No Exams for any institute found!");
+        toast.error(
+          "No exams are currently being conducted. Please check back later!"
+        );
       } finally {
         setInitialInstituteData((prev) => ({
           ...prev,
@@ -107,8 +109,8 @@ function LoginForm() {
 
   if (initialInstituteData.isLoadingInstitute) {
     return (
-      <div className="container md:max-w-96 bg-white p-8 rounded-xl border border-gray-200 shadow-md space-y-6">
-        <h3 className="text-2xl font-semibold text-center">Loading...</h3>
+      <div className="grid place-items-center min-h-screen">
+        <h3 className="">Loading...</h3>
       </div>
     );
   }
@@ -128,10 +130,10 @@ function LoginForm() {
             }
             width={400}
             height={400}
-            alt="institite logo"
-            className={`w-22 h-22 rounded-full`}
+            alt={`logo for ${initialInstituteData.institute_name}`}
+            className={`w-16 h-16 rounded-full border border-neutral-600/20 overflow-hidden`}
           />
-          <p className="">{initialInstituteData.institute_name}</p>
+          <p className="font-semibold">{initialInstituteData.institute_name}</p>
         </div>
 
         <div className="flex items-center justify-between">
@@ -168,7 +170,8 @@ function LoginForm() {
               setInputValues({ ...inputValues, symbolNo: value });
               setValue("symbolNo", value);
             }}
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition disabled:cursor-not-allowed"
+            disabled={!initialInstituteData.isValidated}
           />
           {errors.symbolNo && (
             <p className="text-sm text-red-500 mt-1">
@@ -195,7 +198,8 @@ function LoginForm() {
               setInputValues({ ...inputValues, password: value });
               setValue("password", value);
             }}
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition disabled:cursor-not-allowed"
+            disabled={!initialInstituteData.isValidated}
           />
           {errors.password && (
             <p className="text-sm text-red-500 mt-1">

@@ -105,7 +105,7 @@ export const useUser = () => {
       console.log("🔍 Loading user from storage...");
       const storedUserInfo = localStorage.getItem("userInfo");
       const storedToken = localStorage.getItem("accessToken");
-      
+
       console.log("📦 Stored user info:", !!storedUserInfo);
       console.log("🔑 Stored token:", !!storedToken);
 
@@ -125,7 +125,8 @@ export const useUser = () => {
 
   // Getter functions
   const getAccessToken = useCallback(() => {
-    const token = localStorage.getItem("accessToken") || userInfo?.access_token || null;
+    const token =
+      localStorage.getItem("accessToken") || userInfo?.access_token || null;
     console.log("🔑 Getting access token:", !!token);
     return token;
   }, [userInfo]);
@@ -134,7 +135,14 @@ export const useUser = () => {
     const token = getAccessToken();
     const hasUser = !!userInfo;
     const authenticated = !!token && hasUser;
-    console.log("🔐 Authentication check - Token:", !!token, "User:", hasUser, "Result:", authenticated);
+    console.log(
+      "🔐 Authentication check - Token:",
+      !!token,
+      "User:",
+      hasUser,
+      "Result:",
+      authenticated
+    );
     return authenticated;
   }, [getAccessToken, userInfo]);
 

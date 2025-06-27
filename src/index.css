@@ -3,3 +3,25 @@
 .wrapper {
   @apply max-w-[1600px] mx-auto px-2 sm:px-3 md:px-4 lg:px-5;
 }
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/*  */
+/*  */
+
+.hide-x-scrollbar {
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-width: thin; /* Firefox – keeps vertical visible */
+}
+
+/* Chrome, Safari, Edge */
+.hide-x-scrollbar::-webkit-scrollbar:horizontal {
+  height: 0px;
+}

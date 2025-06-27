@@ -1,18 +1,16 @@
 import axios from "axios";
 import { getAccessTokenFromStorage } from "@/utils/storage";
 
+const baseURL = import.meta.env.VITE_PRODUCTION_SOCKET_URL;
+
 const axiosPublic = axios.create({
-  baseURL: "http://10.10.0.2:8000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: `http://${baseURL}/api`,
+  headers: { "Content-Type": "application/json" },
 });
 
 const axiosPrivate = axios.create({
-  baseURL: "http://10.10.0.2:8000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: `http://${baseURL}/api`,
+  headers: { "Content-Type": "application/json" },
   withCredentials: true,
   timeout: 10000,
 });
@@ -41,7 +39,7 @@ axiosPrivate.interceptors.response.use(
       // Token expired or invalid - clear storage and redirect to login
       localStorage.removeItem("userInfo");
       localStorage.removeItem("accessToken");
-      
+
       // Redirect to login page
       window.location.href = "/login";
     }
