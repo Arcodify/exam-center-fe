@@ -1,30 +1,69 @@
-<H1 align ="center" > Exam FE REACT</h1>
-<h5  align ="center"> 
-<br/>
+# React + TypeScript + Vite
 
-## Configuration and Setup
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-In order to run this project locally, simply fork and clone the repository or download as zip and unzip on your machine.
+Currently, two official plugins are available:
 
-- Open the project in your prefered code editor.
-- Go to terminal -> New terminal (If you are using VS code)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-In the first terminal
+## Expanding the ESLint configuration
 
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      ...tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      ...tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      ...tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-$ cd 
-$ npm install 
-$ npm run dev / pnpm dev 
 
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-
-```
-# .env  ---
-
-BASE_URL=http://192.168.1.66:5173
-BACKEND_URL=http://192.168.1.66/aeirc/exam/api/
-REACT_APP_COMPANY_NAME=YourCompanyName
-COMPANY_LOGO=
-VITE_EXAM_NAME=TEST
-VITE_DEV_BACKEND_URL=http://localhost/aeirc/exam/api
-VITE_PROD_BACKEND_URL=https://examportal.aeirc.tech/api
