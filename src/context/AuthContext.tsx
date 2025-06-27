@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(response.message || "Login failed");
         return false;
       }
-    } catch (error) {
+    } catch (error:any) {
       const errorMessage = error.message || "Login failed";
       toast.error(errorMessage);
       return false;

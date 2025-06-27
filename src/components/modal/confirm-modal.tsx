@@ -1,4 +1,3 @@
-import React from "react";
 import { FaCheckCircle, FaExclamationTriangle, FaTimes } from "react-icons/fa";
 
 interface ConfirmationModalProps {

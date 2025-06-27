@@ -1,36 +1,32 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  FaCheckCircle,
   FaClock,
-  FaExclamationTriangle,
-  FaSpinner,
   FaUserCheck,
+  FaExclamationTriangle,
+  FaCheckCircle,
+  FaSpinner,
 } from "react-icons/fa";
-import { useAuth } from "@/context/AuthContext";
 
 function SocketInitialization() {
-  const [statusMsg, setStatusMsg] = useState<any>(null);
+  const baseURL = import.meta.env.VITE_PRODUCTION_SOCKET_URL
+
+  const [statusMsg, setStatusMsg] = useState(null);
   const [socketConnected, setSocketConnected] = useState(false);
-  const [socketError, setSocketError] = useState<string | null>(null);
-  const [_reconnectAttempts, setReconnectAttempts] = useState(0);
+  const [socketError, setSocketError] = useState(null);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const statusIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const wsRef = useRef(null);
+  const reconnectTimerRef = useRef(null);
+  const statusIntervalRef = useRef(null);
 
-  const { user } = useAuth();
-
-  // Type-safe token getter
-  const getToken = (): string | null => {
-    if (!user?.access_token) {
-      console.warn("No access token found in user context");
-      return null;
-    }
-    return user.access_token;
-  };
+  function getToken() {
+    const storedData = JSON.parse(localStorage.getItem("user"));
+    return storedData?.data?.access_token;
+  }
 
   // Format time remaining in HH:MM:SS
-  const formatTimeRemaining = (seconds: number) => {
+  const formatTimeRemaining = (seconds) => {
     if (!seconds || seconds <= 0) return "00:00:00";
 
     const hours = Math.floor(seconds / 3600);
@@ -43,7 +39,7 @@ function SocketInitialization() {
   };
 
   // Format session end time
-  const formatSessionEnd = (endTime: string) => {
+  const formatSessionEnd = (endTime) => {
     if (!endTime) return "N/A";
     try {
       const date = new Date(endTime);
@@ -62,7 +58,7 @@ function SocketInitialization() {
   };
 
   // Get status color and icon
-  const getStatusInfo = (status: string) => {
+  const getStatusInfo = (status) => {
     switch (status?.toLowerCase()) {
       case "active":
         return {
@@ -110,7 +106,7 @@ function SocketInitialization() {
 
     // Create new WebSocket connection with token in query string
     const socket = new WebSocket(
-      `ws://10.10.0.2:8000/ws/exam/status/?token=${token}`
+      `ws://${baseURL}/ws/exam/status/?token=${token}`
     );
     wsRef.current = socket;
 
@@ -146,7 +142,7 @@ function SocketInitialization() {
       }
     };
 
-    socket.onerror = (_error) => {
+    socket.onerror = (error) => {
       setSocketError("Connection error. Reconnecting...");
       setSocketConnected(false);
     };
@@ -183,11 +179,45 @@ function SocketInitialization() {
   return (
     <div className="w-full py-1">
       {/* Connection Status - Compact */}
+      <div className="w-full flex justify-center mb-2">
+        <div
+          className={`px-4 py-2 rounded-lg text-xs font-medium shadow-sm transition-all duration-300 ${
+            socketConnected
+              ? "bg-green-100 border border-green-400 text-green-800"
+              : socketError
+              ? "bg-red-100 border border-red-400 text-red-800"
+              : "bg-yellow-100 border border-yellow-400 text-yellow-800"
+          }`}
+        >
+          {socketConnected ? (
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Connected</span>
+            </div>
+          ) : socketError ? (
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span>{socketError}</span>
+              <button
+                onClick={handleManualReconnect}
+                className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition-colors duration-200"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+              <span>Connecting...</span>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Exam Status Card - Compact */}
       {statusMsg && (
         <div className="w-full flex justify-center mb-2">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-md m  w-full overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-md max-w-4xl w-full overflow-hidden">
             {/* Header - Compact */}
             <div
               className={`px-4 py-2 ${statusInfo.bg} ${statusInfo.border} border-b`}
@@ -198,41 +228,6 @@ function SocketInitialization() {
                   <h2 className="text-lg font-bold text-gray-800">
                     Exam Status
                   </h2>
-                </div>
-
-                <div className="w-full flex justify-center mb-2">
-                  <div
-                    className={`px-4 py-2 rounded-lg text-xs font-medium shadow-sm transition-all duration-300 ${
-                      socketConnected
-                        ? "bg-green-100 border border-green-400 text-green-800"
-                        : socketError
-                        ? "bg-red-100 border border-red-400 text-red-800"
-                        : "bg-yellow-100 border border-yellow-400 text-yellow-800"
-                    }`}
-                  >
-                    {socketConnected ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span>Connected</span>
-                      </div>
-                    ) : socketError ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                        <span>{socketError}</span>
-                        <button
-                          onClick={handleManualReconnect}
-                          className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition-colors duration-200"
-                        >
-                          Retry
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                        <span>Connecting...</span>
-                      </div>
-                    )}
-                  </div>
                 </div>
                 <div className="text-xs text-gray-500">
                   {new Date(statusMsg.timestamp).toLocaleTimeString()}
@@ -245,18 +240,14 @@ function SocketInitialization() {
               {/* Top Row - Status and Present */}
               <div className="grid grid-cols-2 gap-2 mb-2">
                 <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                  <span className="text-sm font-medium text-gray-700">
-                    Status:
-                  </span>
+                  <span className="text-sm font-medium text-gray-700">Status:</span>
                   <span className={`text-sm font-semibold ${statusInfo.color}`}>
                     {statusMsg.status || "N/A"}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                  <span className="text-sm font-medium text-gray-700">
-                    Present:
-                  </span>
+                  <span className="text-sm font-medium text-gray-700">Present:</span>
                   <div className="flex items-center space-x-1">
                     {statusMsg.present ? (
                       <>
@@ -320,7 +311,7 @@ function SocketInitialization() {
                   {statusMsg.time_remaining && (
                     <div className="mt-1">
                       <div className="w-full bg-gray-200 rounded-full h-1.5">
-                        <div
+                        <div 
                           className="bg-gradient-to-r from-blue-500 to-indigo-500 h-1.5 rounded-full transition-all duration-1000"
                           style={{
                             width: `${Math.min(
@@ -328,9 +319,7 @@ function SocketInitialization() {
                               (statusMsg.time_remaining / 3600) * 100
                             )}%`,
                           }}
-                        >
-                          {" "}
-                        </div>
+                        ></div>
                       </div>
                     </div>
                   )}

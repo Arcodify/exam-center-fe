@@ -2,14 +2,14 @@ import axios from "axios";
 import { getAccessTokenFromStorage } from "@/utils/storage";
 
 const axiosPublic = axios.create({
-  baseURL: "http://69.62.85.89:8000/api",
+  baseURL: "http://10.10.0.2:8000/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const axiosPrivate = axios.create({
-  baseURL: "http://69.62.85.89:8000/api",
+  baseURL: "http://10.10.0.2:8000/api",
   headers: {
     "Content-Type": "application/json",
   },
