@@ -1,13 +1,34 @@
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
+type InstituteData = {
+  session_id: number;
+  start_time: string | null;
+  status: string | null;
+  program_id: number | null;
+  program_name: string | null;
+  institute_name: string | null;
+  institute_logo: string | null;
+  isValidated: boolean;
+  isLoadingInstitute: boolean;
+};
 const Dashboard = () => {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [instituteData, setInstituteData] = useState<InstituteData | null>(
+    null
+  );
   const { user, formatTime } = useAuth();
   const navigate = useNavigate();
 
-  // Show loading if user info is not loaded yet
+  useEffect(() => {
+    const savedData = sessionStorage.getItem("institute-data");
+    const parsedData = savedData ? JSON.parse(savedData) : null;
+
+    console.log(parsedData);
+    setInstituteData(parsedData);
+  }, []);
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -19,6 +40,21 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen p-6 flex flex-col items-center justify-start font-sans">
       <div className="w-full max-w-3xl bg-white rounded-xl shadow-md p-6 space-y-6">
+        {instituteData && (
+          <div className="flex items-center justify-center gap-2">
+            <img
+              src={
+                instituteData.institute_logo ? instituteData.institute_logo : ""
+              }
+              width={400}
+              height={400}
+              alt="institite logo"
+              className={`w-22 h-22 rounded-full`}
+            />
+            <p className="">{instituteData.institute_name}</p>
+          </div>
+        )}
+
         {/* Header with Logout */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">Welcome</h1>

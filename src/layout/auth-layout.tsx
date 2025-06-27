@@ -10,7 +10,7 @@ const AuthLayout = () => {
   const checkAuth = useCallback(() => {
     const userLoaded = loadUserFromStorage();
     console.log("📦 User loaded from storage:", userLoaded);
-  
+
     // Wait for the userInfo to be set before calling isAuthenticated
     setTimeout(() => {
       const authenticated = isAuthenticated();
@@ -19,14 +19,11 @@ const AuthLayout = () => {
       setIsLoading(false);
     }, 0);
   }, [loadUserFromStorage, isAuthenticated]);
-  
 
   useLayoutEffect(() => {
     console.log("🚀 AuthLayout mounted, checking auth...");
     checkAuth();
   }, []); // Empty dependency array - only run once on mount
-
- 
 
   // Show loading while checking authentication
   if (isLoading) {

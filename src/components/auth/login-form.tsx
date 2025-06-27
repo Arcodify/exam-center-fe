@@ -3,13 +3,16 @@ import {
   type LoginFormValues,
 } from "@/validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaKeyboard } from "react-icons/fa";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router";
+import { axiosPublic } from "@/services/axios";
+import toast from "react-hot-toast";
+import logoImage from "@/assets/logo.jpg";
 
 function LoginForm() {
   const [layoutName, setLayoutName] = useState("default");
@@ -17,6 +20,17 @@ function LoginForm() {
   const [inputValues, setInputValues] = useState({
     symbolNo: "",
     password: "",
+  });
+  const [initialInstituteData, setInitialInstituteData] = useState({
+    session_id: null,
+    start_time: null,
+    status: null,
+    program_id: null,
+    program_name: null,
+    institute_name: null,
+    institute_logo: null,
+    isValidated: false,
+    isLoadingInstitute: true,
   });
   const [inputName, setInputName] = useState("symbolNo");
   const { login, isLoading } = useAuth();
@@ -61,81 +75,139 @@ function LoginForm() {
     }
   };
 
+  useEffect(() => {
+    const getIntialInfo = async () => {
+      try {
+        const res = await axiosPublic.get("/initial/info");
+        const data = await res.data;
+
+        setInitialInstituteData((prev) => ({
+          ...prev,
+          data,
+          image: null,
+          isValidated: true,
+        }));
+
+        console.log(await res.data);
+        sessionStorage.setItem("institute-data", JSON.stringify(data));
+      } catch (error: any) {
+        console.error(error.message);
+        setInitialInstituteData((prev) => ({ ...prev, isValidated: false }));
+        toast.error("No Exams for any institute found!");
+      } finally {
+        setInitialInstituteData((prev) => ({
+          ...prev,
+          isLoadingInstitute: false,
+        }));
+      }
+    };
+
+    getIntialInfo();
+  }, []);
+
+  if (initialInstituteData.isLoadingInstitute) {
+    return (
+      <div className="container md:max-w-96 bg-white p-8 rounded-xl border border-gray-200 shadow-md space-y-6">
+        <h3 className="text-2xl font-semibold text-center">Loading...</h3>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center w-full max-w-xl">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full bg-white p-8 rounded-xl border border-gray-200 shadow-md space-y-6"
       >
-        <h1 className="font-bold text-lg text-center text-neutral-800 mb-5">
-          Login
-        </h1>
+        <div className="flex items-center justify-center gap-2">
+          <img
+            src={
+              initialInstituteData.institute_logo
+                ? initialInstituteData.institute_logo
+                : logoImage
+            }
+            width={400}
+            height={400}
+            alt="institite logo"
+            className={`w-22 h-22 rounded-full`}
+          />
+          <p className="">{initialInstituteData.institute_name}</p>
+        </div>
 
-        <div className="button-level flex justify-between items-center">
+        <div className="flex items-center justify-between">
+          <h1 className="font-bold text-2xl text-neutral-800">Login</h1>
+
+          <div className="button-level flex justify-between items-center">
+            <button
+              type="button"
+              onClick={() => setShowKeyboard(!showKeyboard)}
+              disabled={isLoading || !initialInstituteData.isValidated}
+              className="bg-gray-200 text-gray-700 text-xs p-2 rounded mt-2 disabled:cursor-not-allowed"
+            >
+              {showKeyboard ? <FaKeyboard /> : <FaKeyboard color="red" />}
+            </button>
+          </div>
+        </div>
+
+        <div className="">
           <label
             className="text-xs md:text-sm text-neutral-600 font-semibold mb-2"
             htmlFor="symbolNo"
           >
             Symbol No.
           </label>
-          <button
-            type="button"
-            onClick={() => setShowKeyboard(!showKeyboard)}
-            className="bg-gray-200 text-gray-700 text-xs p-2 rounded mt-2"
-          >
-            {showKeyboard ? <FaKeyboard /> : <FaKeyboard color="red" />}
-          </button>
+          <input
+            type="text"
+            autoComplete="off"
+            {...register("symbolNo")}
+            placeholder="Enter your Symbol No."
+            value={inputValues.symbolNo}
+            onFocus={() => setInputName("symbolNo")}
+            onChange={(e) => {
+              const value = e.target.value;
+              setInputValues({ ...inputValues, symbolNo: value });
+              setValue("symbolNo", value);
+            }}
+            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+          />
+          {errors.symbolNo && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.symbolNo.message}
+            </p>
+          )}
         </div>
-        <input
-          type="text"
-          autoComplete="off"
-          {...register("symbolNo")}
-          placeholder="Enter your Symbol No."
-          value={inputValues.symbolNo}
-          onFocus={() => setInputName("symbolNo")}
-          onChange={(e) => {
-            const value = e.target.value;
-            setInputValues({ ...inputValues, symbolNo: value });
-            setValue("symbolNo", value);
-          }}
-          className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
-        />
-        {errors.symbolNo && (
-          <p className="text-sm text-red-500 mt-1">{errors.symbolNo.message}</p>
-        )}
 
-        <br />
-        <div className="flex justify-between items-center mb-2">
+        <div className="">
           <label
             className="text-xs md:text-sm text-neutral-600 font-semibold"
             htmlFor="password"
           >
             Password
           </label>
+          <input
+            type="password"
+            {...register("password")}
+            placeholder="Enter your password"
+            value={inputValues.password}
+            onFocus={() => setInputName("password")}
+            onChange={(e) => {
+              const value = e.target.value;
+              setInputValues({ ...inputValues, password: value });
+              setValue("password", value);
+            }}
+            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+          />
+          {errors.password && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.password.message}
+            </p>
+          )}
         </div>
-        <input
-          type="password"
-          {...register("password")}
-          placeholder="Enter your password"
-          value={inputValues.password}
-          onFocus={() => setInputName("password")}
-          onChange={(e) => {
-            const value = e.target.value;
-            setInputValues({ ...inputValues, password: value });
-            setValue("password", value);
-          }}
-          className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
-        />
-        {errors.password && (
-          <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
-        )}
 
-        <br />
-        {/* Submit Button */}
         <button
           type="submit"
-          disabled={isLoading}
-          className={`w-full mt-2 py-2 px-4 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition ${
+          disabled={isLoading || !initialInstituteData.isValidated}
+          className={`w-full mt-2 py-2 px-4 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition disabled:bg-orange-300 disabled:cursor-not-allowed ${
             isLoading && "opacity-60 cursor-not-allowed"
           }`}
         >
