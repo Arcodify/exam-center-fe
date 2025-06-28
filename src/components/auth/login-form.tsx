@@ -17,6 +17,7 @@ import logoImage from "@/assets/logo.jpg";
 function LoginForm() {
   const [layoutName, setLayoutName] = useState("default");
   const [showKeyboard, setShowKeyboard] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [inputValues, setInputValues] = useState({
     symbolNo: "",
     password: "",
@@ -187,8 +188,9 @@ function LoginForm() {
           >
             Password
           </label>
+          <div className="relative">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             {...register("password")}
             placeholder="Enter your password"
             value={inputValues.password}
@@ -198,9 +200,19 @@ function LoginForm() {
               setInputValues({ ...inputValues, password: value });
               setValue("password", value);
             }}
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition disabled:cursor-not-allowed"
+            className="w-full mt-1 px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition disabled:cursor-not-allowed"
             disabled={!initialInstituteData.isValidated}
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute top-1/2 right-3 transform -translate-y-1/2 text-sm text-gray-600"
+            tabIndex={-1}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
+
           {errors.password && (
             <p className="text-sm text-red-500 mt-1">
               {errors.password.message}
