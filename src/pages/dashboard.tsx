@@ -16,7 +16,6 @@ type InstituteData = {
 };
 
 const Dashboard = () => {
-  const [isExamStarted, setIsExamStarted] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [instituteData, setInstituteData] = useState<InstituteData | null>(
     null
@@ -32,25 +31,6 @@ const Dashboard = () => {
     setInstituteData(parsedData);
   }, []);
 
-  useEffect(() => {
-    const savedData = sessionStorage.getItem("institute-data");
-    const parsedData = savedData ? JSON.parse(savedData) : null;
-
-    setInstituteData(parsedData);
-
-    if (parsedData?.start_time) {
-      const checkStartTime = () => {
-        const now = new Date();
-        const examStartTime = new Date(parsedData.start_time);
-        setIsExamStarted(now >= examStartTime);
-      };
-
-      checkStartTime(); // Initial check
-
-      const interval = setInterval(checkStartTime, 1000); // Check every second
-      return () => clearInterval(interval); // Cleanup on unmount
-    }
-  }, []);
 
 
   if (!user) {
@@ -244,7 +224,7 @@ const Dashboard = () => {
                   I accept the <strong>terms and conditions</strong> of the exam and understand all the instructions provided above.
                 </span>
               </label>
-              {instituteData?.start_time && !isExamStarted && (
+              {instituteData?.start_time && (
                 <div className="text-sm pb-0 mb-0 text-orange-600 font-medium">
                   ⏳ Exam will start at:{" "}
                   {new Date(instituteData.start_time).toLocaleTimeString()}
@@ -253,10 +233,10 @@ const Dashboard = () => {
 
               <button
                 type="button"
-                disabled={!isTermsAccepted || !isExamStarted}
+                disabled={!isTermsAccepted}
 
                 onClick={() => navigate("/questions")}
-                className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all disabled:cursor-not-allowed ${isTermsAccepted && isExamStarted
+                className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all disabled:cursor-not-allowed ${isTermsAccepted
                   ? "bg-orange-600 hover:bg-orange-700 text-white shadow-md"
                   : "bg-slate-200 text-slate-400"
                   }`}
