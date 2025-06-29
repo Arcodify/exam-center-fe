@@ -9,6 +9,9 @@ const UserInfo = () => {
     photo:
       user?.photo ||
       "https://t4.ftcdn.net/jpg/02/24/86/95/360_F_224869519_aRaeLneqALfPNBzg0xxMZXghtvBXkfIA.jpg",
+
+    program: user?.program,
+    level: user?.level,
   };
 
   return (
@@ -29,18 +32,14 @@ const UserInfo = () => {
           <span className="font-medium">Symbol No: </span>
           <span className="">{userInfo.symbolNumber}</span>
         </p>
-
-        {/* Info */}
-        {/* <div className="flex flex-col gap-3 w-full">
-          <div className="flex justify-between bg-white px-4 py-2 rounded-lg shadow-sm text-gray-700">
-            <span className="font-medium">Name</span>
-            <span className="font-semibold">{userInfo.name}</span>
-          </div>
-          <div className="flex justify-between bg-white px-4 py-2 rounded-lg shadow-sm text-gray-700">
-            <span className="font-medium">Symbol No.</span>
-            <span className="font-semibold">{userInfo.symbolNumber}</span>
-          </div>
-        </div> */}
+        <p className="text-slate-600">
+          <span className="font-medium">Program: </span>
+          <span className="">{userInfo.program?.name}</span>
+        </p>
+        <p className="text-slate-600">
+          <span className="font-medium">Level: </span>
+          <span className="">{userInfo.level?.name}</span>
+        </p>
       </div>
     </div>
   );
