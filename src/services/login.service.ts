@@ -17,7 +17,7 @@ class LoginService {
       return {
         success: false,
         data: null,
-        message: error.response.data.message || "Login failed",
+        message: error.response.data.message || error.response.data.error,
       };
     }
   }

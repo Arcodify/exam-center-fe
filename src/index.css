@@ -25,3 +25,27 @@
 .hide-x-scrollbar::-webkit-scrollbar:horizontal {
   height: 0px;
 }
+
+.sticky-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  padding: 12px 16px;
+  border-top: 1px solid #e5e5e5;
+  z-index: 10;
+}
+
+@media (max-width: 1023px) {
+  .sticky-bottom{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+}

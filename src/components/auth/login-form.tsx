@@ -69,10 +69,10 @@ function LoginForm() {
     });
 
     if (success) {
-      console.log("✅ Login successful, redirecting to dashboard...");
+      console.log("✅ Login successful !");
       navigate("/");
     } else {
-      console.log("❌ Login failed");
+      console.log("Login failed please try again.");
     }
   };
 
@@ -189,29 +189,29 @@ function LoginForm() {
             Password
           </label>
           <div className="relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            {...register("password")}
-            placeholder="Enter your password"
-            value={inputValues.password}
-            onFocus={() => setInputName("password")}
-            onChange={(e) => {
-              const value = e.target.value;
-              setInputValues({ ...inputValues, password: value });
-              setValue("password", value);
-            }}
-            className="w-full mt-1 px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition disabled:cursor-not-allowed"
-            disabled={!initialInstituteData.isValidated}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute top-1/2 right-3 transform -translate-y-1/2 text-sm text-gray-600"
-            tabIndex={-1}
-          >
-            {showPassword ? "Hide" : "Show"}
-          </button>
-        </div>
+            <input
+              type={showPassword ? "text" : "password"}
+              {...register("password")}
+              placeholder="Enter your password"
+              value={inputValues.password}
+              onFocus={() => setInputName("password")}
+              onChange={(e) => {
+                const value = e.target.value;
+                setInputValues({ ...inputValues, password: value });
+                setValue("password", value);
+              }}
+              className="w-full mt-1 px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition disabled:cursor-not-allowed"
+              disabled={!initialInstituteData.isValidated}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-sm text-gray-600"
+              tabIndex={-1}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
 
           {errors.password && (
             <p className="text-sm text-red-500 mt-1">
@@ -223,9 +223,8 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isLoading || !initialInstituteData.isValidated}
-          className={`w-full mt-2 py-2 px-4 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition disabled:bg-orange-300 disabled:cursor-not-allowed ${
-            isLoading && "opacity-60 cursor-not-allowed"
-          }`}
+          className={`w-full mt-2 py-2 px-4 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition disabled:bg-orange-300 disabled:cursor-not-allowed ${isLoading && "opacity-60 cursor-not-allowed"
+            }`}
         >
           {isLoading ? (
             <div className="flex items-center justify-center">Loading...</div>

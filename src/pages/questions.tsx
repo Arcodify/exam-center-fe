@@ -64,10 +64,10 @@ const Questions = () => {
       prev.map((q: any) =>
         q.id === id
           ? {
-              ...q,
-              student_answer: answer,
-              is_answered: true,
-            }
+            ...q,
+            student_answer: answer,
+            is_answered: true,
+          }
           : q
       )
     );
@@ -90,8 +90,7 @@ const Questions = () => {
       }
 
       console.log(
-        `Navigating from question ${currentQuestionIndex + 1} to ${
-          currentQuestionIndex + 2
+        `Navigating from question ${currentQuestionIndex + 1} to ${currentQuestionIndex + 2
         }`
       );
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -101,8 +100,7 @@ const Questions = () => {
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       console.log(
-        `Navigating from question ${
-          currentQuestionIndex + 1
+        `Navigating from question ${currentQuestionIndex + 1
         } to ${currentQuestionIndex}`
       );
       setCurrentQuestionIndex(currentQuestionIndex - 1);
@@ -135,10 +133,10 @@ const Questions = () => {
       prev.map((q: any) =>
         q.id === currentQuestion.id
           ? {
-              ...q,
-              student_answer: null,
-              is_answered: false,
-            }
+            ...q,
+            student_answer: null,
+            is_answered: false,
+          }
           : q
       )
     );
@@ -185,9 +183,9 @@ const Questions = () => {
                 </h1>
               </div>
 
-              <div className="lg:hidden mb-4 p-3 bg-slate-50 rounded-lg">
+              {/* <div className="lg:hidden mb-4 p-3 bg-slate-50 rounded-lg">
                 <UserInfo />
-              </div>
+              </div> */}
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-slate-600">
                 <span className="font-medium whitespace-nowrap">
@@ -197,9 +195,8 @@ const Questions = () => {
                   <div
                     className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                     style={{
-                      width: `${
-                        ((currentQuestionIndex + 1) / totalQuestions) * 100
-                      }%`,
+                      width: `${((currentQuestionIndex + 1) / totalQuestions) * 100
+                        }%`,
                     }}
                   />
                 </div>
@@ -210,7 +207,7 @@ const Questions = () => {
             </div>
           </div>
 
-          <div className="flex-1 px-4 md:px-6 py-6">
+          <div className="flex-1 px-4 md:px-6 py-6 relative">
             <div className="max-w-4xl mx-auto">
               <div className="bg-white border border-slate-200 rounded-lg p-4 mb-6">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -257,15 +254,14 @@ const Questions = () => {
               </div>
             </div>
 
-            <section className="absolute  left-1/2 -translate-x-1/2 bottom-2 flex items-center gap-2 w-fit ">
+            <section className="sticky-bottom">
               <button
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  currentQuestionIndex === 0
-                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                    : "bg-blue-400 border border-slate-200 text-slate-200 hover:bg-blue-500"
-                }`}
+                className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${currentQuestionIndex === 0
+                  ? "bg-slate-100 text-white cursor-not-allowed"
+                  : "bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
+                  }`}
               >
                 <svg
                   className="w-4 h-4"
@@ -297,7 +293,7 @@ const Questions = () => {
                     handleNext();
                   }
                 }}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-slate-200 hover:bg-blue-500"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
               >
                 {currentQuestionIndex === questions.length - 1 ? (
                   "Submit Exam"
@@ -324,7 +320,7 @@ const Questions = () => {
           </div>
         </div>
 
-        <aside className="flex flex-col justify-between w-82 bg-white border-l border-slate-200 ">
+        <aside className="flex flex-col justify-between w-82 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 mx-auto">
           <div className="p-4 pt-10 border-b border-slate-200">
             <UserInfo />
           </div>
@@ -339,15 +335,14 @@ const Questions = () => {
                   <button
                     key={question.id}
                     onClick={() => goToQuestion(index)}
-                    className={`w-10 h-10 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
-                      index === currentQuestionIndex
-                        ? "bg-blue-600 text-white ring-2 ring-blue-200"
-                        : question.is_answered
+                    className={`w-10 h-10 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${index === currentQuestionIndex
+                      ? "bg-blue-600 text-white ring-2 ring-blue-200"
+                      : question.is_answered
                         ? "bg-green-700 text-slate-100 hover:bg-green-200"
                         : skippedQuestions.has(question.id)
-                        ? "bg-red-700 text-slate-100 hover:bg-red-200"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
+                          ? "bg-red-700 text-slate-100 hover:bg-red-200"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      }`}
                   >
                     {index + 1}
                   </button>

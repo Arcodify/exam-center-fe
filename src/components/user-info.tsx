@@ -13,7 +13,7 @@ const UserInfo = () => {
 
   return (
     <div className="bg-white/80 rounded-xl border border-white/30 p-5 w-full mx-auto">
-      <div className="flex flex-col sm:flex-row lg:flex-col items-start">
+      <div className="flex flex-col items-start">
         {/* Photo */}
         <img
           src={userInfo.photo}

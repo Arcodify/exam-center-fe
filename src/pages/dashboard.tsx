@@ -16,6 +16,7 @@ type InstituteData = {
 };
 
 const Dashboard = () => {
+  const [isExamStarted, setIsExamStarted] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [instituteData, setInstituteData] = useState<InstituteData | null>(
     null
@@ -30,6 +31,27 @@ const Dashboard = () => {
     console.log(parsedData);
     setInstituteData(parsedData);
   }, []);
+
+  useEffect(() => {
+    const savedData = sessionStorage.getItem("institute-data");
+    const parsedData = savedData ? JSON.parse(savedData) : null;
+
+    setInstituteData(parsedData);
+
+    if (parsedData?.start_time) {
+      const checkStartTime = () => {
+        const now = new Date();
+        const examStartTime = new Date(parsedData.start_time);
+        setIsExamStarted(now >= examStartTime);
+      };
+
+      checkStartTime(); // Initial check
+
+      const interval = setInterval(checkStartTime, 1000); // Check every second
+      return () => clearInterval(interval); // Cleanup on unmount
+    }
+  }, []);
+
 
   if (!user) {
     return (
@@ -184,8 +206,12 @@ const Dashboard = () => {
             </div>
 
             {/* Terms and Start Button */}
-            <div className="space-y-4 pt-2">
-              <label className="flex items-start gap-3 cursor-pointer group">
+            <div className="space-y-6 pt-4 border border-orange-300 bg-orange-50 p-6 rounded-xl shadow-sm animate-fade-in">
+              <h3 className="text-lg font-bold text-orange-700 flex items-center gap-2">
+                ⚠️ Please Read & Accept
+              </h3>
+
+              <label className="flex items-start gap-4 cursor-pointer group">
                 <div className="relative flex items-center justify-center">
                   <input
                     type="checkbox"
@@ -194,15 +220,14 @@ const Dashboard = () => {
                     onChange={() => setIsTermsAccepted(!isTermsAccepted)}
                   />
                   <div
-                    className={`w-4 h-4 border-2 rounded transition-all ${
-                      isTermsAccepted
-                        ? "bg-orange-600 border-orange-600"
-                        : "border-slate-300 group-hover:border-slate-400"
-                    }`}
+                    className={`w-6 h-6 border-2 rounded-md transition-all flex items-center justify-center ${isTermsAccepted
+                      ? "bg-orange-600 border-orange-600"
+                      : "border-black group-hover:border-orange-400"
+                      }`}
                   >
                     {isTermsAccepted && (
                       <svg
-                        className="w-3 h-3 text-white"
+                        className="w-4 h-4 text-white"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -215,27 +240,31 @@ const Dashboard = () => {
                     )}
                   </div>
                 </div>
-                <span className="text-sm text-slate-700 leading-relaxed">
-                  I accept the terms and conditions of the exam and understand
-                  all the instructions provided above.
+                <span className="text-base text-slate-800 font-medium leading-relaxed">
+                  I accept the <strong>terms and conditions</strong> of the exam and understand all the instructions provided above.
                 </span>
               </label>
+              {instituteData?.start_time && !isExamStarted && (
+                <div className="text-sm pb-0 mb-0 text-orange-600 font-medium">
+                  ⏳ Exam will start at:{" "}
+                  {new Date(instituteData.start_time).toLocaleTimeString()}
+                </div>
+              )}
 
               <button
                 type="button"
-                disabled={!isTermsAccepted}
+                disabled={!isTermsAccepted || !isExamStarted}
+
                 onClick={() => navigate("/questions")}
-                className={`w-full py-3 px-4 rounded-lg font-medium text-sm transition-all cursor-pointer disabled:cursor-not-allowed ${
-                  isTermsAccepted
-                    ? "bg-orange-600 hover:bg-orange-700 text-white shadow-sm"
-                    : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                }`}
+                className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all disabled:cursor-not-allowed ${isTermsAccepted && isExamStarted
+                  ? "bg-orange-600 hover:bg-orange-700 text-white shadow-md"
+                  : "bg-slate-200 text-slate-400"
+                  }`}
               >
-                {isTermsAccepted
-                  ? "Start Exam"
-                  : "Please accept the terms and conditions"}
+                {isTermsAccepted ? "Start Exam" : "Please accept the terms and conditions"}
               </button>
             </div>
+
           </div>
         </div>
       </div>
