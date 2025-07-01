@@ -40,9 +40,9 @@ const SessionEndModal = () => {
           </div>
           <div>
             <h2 className="text-base font-bold text-gray-800">
-              Session Ending Soon
+              Session Ended
             </h2>
-            <p className="text-xs text-gray-600">Time is running out</p>
+            <p className="text-xs text-gray-600">Time is up</p>
           </div>
         </div>
 
@@ -53,9 +53,7 @@ const SessionEndModal = () => {
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <FaExclamationTriangle className="w-6 h-6 text-red-600" />
             </div>
-            <p className="font-medium text-gray-800">
-              Make sure you've answered everything.
-            </p>
+          
             <p className="text-gray-600 text-xs">
               Your exam will auto-submit shortly.
             </p>
