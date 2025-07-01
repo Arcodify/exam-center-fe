@@ -80,11 +80,8 @@ function LoginForm() {
     const getIntialInfo = async () => {
       try {
         const res = await axiosPublic.get("/initial/info");
-
-        console.log(res ," hello world ");
         const data = await res.data;
 
-        console.log(res);
         if (!data) throw new Error("No data was found");
 
         setInitialInstituteData((prev) => ({
