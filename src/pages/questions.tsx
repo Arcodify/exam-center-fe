@@ -2,7 +2,6 @@ import ConfirmationModal from "@/components/modal/confirm-modal";
 import QuestionCard from "@/components/question-card";
 import SocketInitialization from "@/components/socket/socket";
 import UserInfo from "@/components/user-info";
-import { useAuth } from "@/context/AuthContext";
 import useQuestion from "@/hook/useQuestion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -33,7 +32,7 @@ const Questions = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { questions, setQuestions, fetchQuestions, answerSubmit, sessionEnd } =
     useQuestion();
-  const { logout, user } = useAuth();
+ 
 
   useEffect(() => {
     fetchQuestions();
@@ -126,8 +125,8 @@ const Questions = () => {
     } finally {
       setIsSubmitting(false);
       setIsModalOpen(false);
-      logout();
-      navigate("/login");
+
+      navigate("/thank-you");
     }
   };
 

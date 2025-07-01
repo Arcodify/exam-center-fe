@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  FaClock,
-  FaExclamationTriangle,
-  FaCheckCircle,
-  FaSpinner,
-  FaUserCheck,
-} from "react-icons/fa";
+import PauseStatus from "../modal/pause-status-modal";
+import SessionEndModal from "../modal/session-end-modal";
 
 interface StatusMessage {
   status: string;
@@ -14,13 +9,6 @@ interface StatusMessage {
   session_effective_end: string;
   time_remaining: number;
   timestamp?: string;
-}
-
-interface StatusInfo {
-  color: string;
-  bg: string;
-  border: string;
-  icon: React.ElementType;
 }
 
 function SocketInitialization() {
@@ -46,69 +34,6 @@ function SocketInitialization() {
       return null;
     }
   }
-
-  const formatTimeRemaining = (seconds?: number): string => {
-    if (!seconds || seconds <= 0) return "00:00:00";
-
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const formatSessionEnd = (endTime?: string): string => {
-    if (!endTime) return "N/A";
-    try {
-      const date = new Date(endTime);
-      return date.toLocaleString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        timeZoneName: "short",
-      });
-    } catch {
-      return endTime;
-    }
-  };
-
-  const getStatusInfo = (status?: string): StatusInfo => {
-    switch (status?.toLowerCase()) {
-      case "active":
-        return {
-          color: "text-green-600",
-          bg: "bg-green-50",
-          border: "border-green-200",
-          icon: FaCheckCircle,
-        };
-      case "inactive":
-        return {
-          color: "text-red-600",
-          bg: "bg-red-50",
-          border: "border-red-200",
-          icon: FaExclamationTriangle,
-        };
-      case "pending":
-        return {
-          color: "text-yellow-600",
-          bg: "bg-yellow-50",
-          border: "border-yellow-200",
-          icon: FaSpinner,
-        };
-      default:
-        return {
-          color: "text-gray-600",
-          bg: "bg-gray-50",
-          border: "border-gray-200",
-          icon: FaExclamationTriangle,
-        };
-    }
-  };
 
   const connectWebSocket = () => {
     const token = getToken();
@@ -179,8 +104,21 @@ function SocketInitialization() {
     connectWebSocket();
   };
 
-  const statusInfo = getStatusInfo(statusMsg?.status);
-  const StatusIcon = statusInfo.icon;
+  if (
+    statusMsg?.status === "submitted" ||
+    statusMsg?.session_status === "submitted" ||
+    statusMsg?.status === "completed" ||
+    statusMsg?.session_status === "completed"
+  ) {
+    return <SessionEndModal />;
+  }
+
+  if (
+    statusMsg?.status === "paused" ||
+    statusMsg?.session_status === "paused"
+  ) {
+    return <PauseStatus />;
+  }
 
   return (
     <div className="w-full py-1">
@@ -218,120 +156,6 @@ function SocketInitialization() {
           )}
         </div>
       </div>
-
-      {statusMsg && (
-        <div className="hidden w-full flex justify-center mb-2">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-md max-w-4xl w-full overflow-hidden">
-            <div
-              className={`px-4 py-2 ${statusInfo.bg} ${statusInfo.border} border-b`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <StatusIcon className={`text-lg ${statusInfo.color}`} />
-                  <h2 className="text-lg font-bold text-gray-800">
-                    Exam Status
-                  </h2>
-                </div>
-                <div className="text-xs text-gray-500">
-                  {new Date(statusMsg.timestamp || "").toLocaleTimeString()}
-                </div>
-              </div>
-            </div>
-
-            <div className="p-3">
-              <div className="grid grid-cols-2 gap-2 mb-2">
-                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                  <span className="text-sm font-medium text-gray-700">
-                    Status:
-                  </span>
-                  <span className={`text-sm font-semibold ${statusInfo.color}`}>
-                    {statusMsg.status || "N/A"}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                  <span className="text-sm font-medium text-gray-700">
-                    Present:
-                  </span>
-                  <div className="flex items-center space-x-1">
-                    {statusMsg.present ? (
-                      <>
-                        <FaUserCheck className="text-green-500 text-sm" />
-                        <span className="text-green-600 font-semibold text-sm">
-                          Yes
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <FaExclamationTriangle className="text-red-500 text-sm" />
-                        <span className="text-red-600 font-semibold text-sm">
-                          No
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 mb-2">
-                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                  <span className="text-sm font-medium text-gray-700">
-                    Session:
-                  </span>
-                  <span className="text-sm font-semibold text-blue-600">
-                    {statusMsg.session_status || "N/A"}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                  <span className="text-sm font-medium text-gray-700">
-                    Ends:
-                  </span>
-                  <span className="text-sm font-semibold text-gray-800">
-                    {formatSessionEnd(statusMsg.session_effective_end)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md border border-blue-200">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center space-x-2">
-                    <FaClock className="text-blue-500 text-sm" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Time Remaining
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {statusMsg.time_remaining
-                      ? `${statusMsg.time_remaining.toFixed(0)}s`
-                      : "0s"}
-                  </span>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600 font-mono">
-                    {formatTimeRemaining(statusMsg.time_remaining)}
-                  </div>
-                  {statusMsg.time_remaining && (
-                    <div className="mt-1">
-                      <div className="w-full bg-gray-200 rounded-full h-1.5">
-                        <div
-                          className="bg-gradient-to-r from-blue-500 to-indigo-500 h-1.5 rounded-full transition-all duration-1000"
-                          style={{
-                            width: `${Math.min(
-                              100,
-                              (statusMsg.time_remaining / 3600) * 100
-                            )}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
