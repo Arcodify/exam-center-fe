@@ -169,6 +169,7 @@ const Questions = () => {
         <div className="flex-1 flex flex-col relative">
           <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-4">
             <div className="max-w-4xl mx-auto">
+            <SocketInitialization />
               <div className="flex items-center justify-between w-full gap-2 mb-10">
                 {instituteData && (
                   <div className="">
@@ -182,7 +183,7 @@ const Questions = () => {
                   </div>
                 )}
 
-                <SocketInitialization />
+               
 
                 <h1 className="text-lg font-semibold text-slate-900 text-center text-nowrap">
                   {instituteData?.program_name}

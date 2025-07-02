@@ -184,7 +184,7 @@ const Dashboard = () => {
                 </ul>
               </div>
             </div>
-
+            
             {/* Terms and Start Button */}
             <div className="space-y-6 pt-4 border border-orange-300 bg-orange-50 p-6 rounded-xl shadow-sm animate-fade-in">
               <h3 className="text-lg font-bold text-orange-700 flex items-center gap-2">
