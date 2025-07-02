@@ -42,7 +42,7 @@ const Questions = () => {
     const savedData = sessionStorage.getItem("institute-data");
     const parsedData = savedData ? JSON.parse(savedData) : null;
 
-    console.log(parsedData, "parsedData");
+   
 
     setInstituteData(parsedData);
   }, []);
@@ -60,7 +60,7 @@ const Questions = () => {
   }
 
   const handleSelectAnswer = (id: number, answer: string) => {
-    console.log(`Question ${id}: Selected answer "${answer}"`);
+   
     answerSubmit(id, answer);
     setQuestions((prev: any) =>
       prev.map((q: any) =>
@@ -85,34 +85,24 @@ const Questions = () => {
     if (currentQuestionIndex < questions.length - 1) {
       const currentQuestion = questions[currentQuestionIndex];
       if (!currentQuestion.is_answered) {
-        console.log(
-          `Auto-skipping question ${currentQuestion.id} - no answer provided`
-        );
+       
         setSkippedQuestions((prev) => new Set([...prev, currentQuestion.id]));
       }
 
-      console.log(
-        `Navigating from question ${currentQuestionIndex + 1} to ${
-          currentQuestionIndex + 2
-        }`
-      );
+     
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-      console.log(
-        `Navigating from question ${
-          currentQuestionIndex + 1
-        } to ${currentQuestionIndex}`
-      );
+     
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
   const handleSubmit = () => {
-    console.log("Submitting answers");
+   
     setIsModalOpen(true);
   };
 
@@ -132,7 +122,7 @@ const Questions = () => {
 
   const resetCurrentQuestion = () => {
     const currentQuestion = questions[currentQuestionIndex];
-    console.log(`Resetting question ${currentQuestion.id}`);
+   
     setQuestions((prev: any) =>
       prev.map((q: any) =>
         q.id === currentQuestion.id
@@ -153,7 +143,7 @@ const Questions = () => {
   };
 
   const goToQuestion = (index: number) => {
-    console.log(`Jumping to question ${index + 1}`);
+
     setCurrentQuestionIndex(index);
   };
 
@@ -161,7 +151,7 @@ const Questions = () => {
   const skippedCount = skippedQuestions.size;
   const totalQuestions = questions.length;
 
-  console.log(instituteData, "instituteData");
+
 
   return (
     <div className="min-h-screen bg-slate-50">

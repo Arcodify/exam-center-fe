@@ -55,8 +55,7 @@ export const useUser = () => {
         credentials.symbol_number,
         credentials.password
       );
-
-      console.log(response, "response from hook");
+      
 
       if (response.success) {
         // Store user data and token in localStorage
@@ -102,23 +101,22 @@ export const useUser = () => {
   // Load user data from localStorage on app start
   const loadUserFromStorage = useCallback(() => {
     try {
-      console.log("🔍 Loading user from storage...");
+     
       const storedUserInfo = localStorage.getItem("userInfo");
       const storedToken = localStorage.getItem("accessToken");
 
-      console.log("📦 Stored user info:", !!storedUserInfo);
-      console.log("🔑 Stored token:", !!storedToken);
+     
 
       if (storedUserInfo && storedToken) {
         const userData = JSON.parse(storedUserInfo);
-        console.log("👤 User data loaded:", userData.name);
+       
         setUserInfo(userData);
         return true;
       }
-      console.log("❌ No user data or token found");
+     
       return false;
     } catch (error) {
-      console.error("❌ Error loading user from storage:", error);
+     
       return false;
     }
   }, []);
@@ -127,7 +125,7 @@ export const useUser = () => {
   const getAccessToken = useCallback(() => {
     const token =
       localStorage.getItem("accessToken") || userInfo?.access_token || null;
-    console.log("🔑 Getting access token:", !!token);
+   
     return token;
   }, [userInfo]);
 
@@ -135,14 +133,7 @@ export const useUser = () => {
     const token = getAccessToken();
     const hasUser = !!userInfo;
     const authenticated = !!token && hasUser;
-    console.log(
-      "🔐 Authentication check - Token:",
-      !!token,
-      "User:",
-      hasUser,
-      "Result:",
-      authenticated
-    );
+   
     return authenticated;
   }, [getAccessToken, userInfo]);
 

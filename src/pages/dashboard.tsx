@@ -1,7 +1,7 @@
+import UserPhoto from "@/assets/man.png";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import UserPhoto from "@/assets/man.png";
 
 type InstituteData = {
   session_id: number;
@@ -27,11 +27,8 @@ const Dashboard = () => {
     const savedData = sessionStorage.getItem("institute-data");
     const parsedData = savedData ? JSON.parse(savedData) : null;
 
-    console.log(parsedData);
     setInstituteData(parsedData);
   }, []);
-
-
 
   if (!user) {
     return (
@@ -184,7 +181,7 @@ const Dashboard = () => {
                 </ul>
               </div>
             </div>
-            
+
             {/* Terms and Start Button */}
             <div className="space-y-6 pt-4 border border-orange-300 bg-orange-50 p-6 rounded-xl shadow-sm animate-fade-in">
               <h3 className="text-lg font-bold text-orange-700 flex items-center gap-2">
@@ -200,10 +197,11 @@ const Dashboard = () => {
                     onChange={() => setIsTermsAccepted(!isTermsAccepted)}
                   />
                   <div
-                    className={`w-6 h-6 border-2 rounded-md transition-all flex items-center justify-center ${isTermsAccepted
-                      ? "bg-orange-600 border-orange-600"
-                      : "border-black group-hover:border-orange-400"
-                      }`}
+                    className={`w-6 h-6 border-2 rounded-md transition-all flex items-center justify-center ${
+                      isTermsAccepted
+                        ? "bg-orange-600 border-orange-600"
+                        : "border-black group-hover:border-orange-400"
+                    }`}
                   >
                     {isTermsAccepted && (
                       <svg
@@ -221,7 +219,8 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <span className="text-base text-slate-800 font-medium leading-relaxed">
-                  I accept the <strong>terms and conditions</strong> of the exam and understand all the instructions provided above.
+                  I accept the <strong>terms and conditions</strong> of the exam
+                  and understand all the instructions provided above.
                 </span>
               </label>
               {instituteData?.start_time && (
@@ -234,17 +233,18 @@ const Dashboard = () => {
               <button
                 type="button"
                 disabled={!isTermsAccepted}
-
                 onClick={() => navigate("/questions")}
-                className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all disabled:cursor-not-allowed ${isTermsAccepted
-                  ? "bg-orange-600 hover:bg-orange-700 text-white shadow-md"
-                  : "bg-slate-200 text-slate-400"
-                  }`}
+                className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all disabled:cursor-not-allowed ${
+                  isTermsAccepted
+                    ? "bg-orange-600 hover:bg-orange-700 text-white shadow-md"
+                    : "bg-slate-200 text-slate-400"
+                }`}
               >
-                {isTermsAccepted ? "Start Exam" : "Please accept the terms and conditions"}
+                {isTermsAccepted
+                  ? "Start Exam"
+                  : "Please accept the terms and conditions"}
               </button>
             </div>
-
           </div>
         </div>
       </div>

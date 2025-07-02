@@ -62,17 +62,14 @@ function LoginForm() {
   };
 
   const onSubmit = async (data: LoginFormValues) => {
-    console.log("🚀 Login attempt with:", data.symbolNo);
     const success = await login({
       symbol_number: data.symbolNo,
       password: data.password,
     });
 
     if (success) {
-      console.log("✅ Login successful !");
       navigate("/");
     } else {
-      console.log("Login failed please try again.");
     }
   };
 
@@ -222,8 +219,9 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isLoading || !initialInstituteData.isValidated}
-          className={`w-full mt-2 py-2 px-4 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition disabled:bg-orange-300 disabled:cursor-not-allowed ${isLoading && "opacity-60 cursor-not-allowed"
-            }`}
+          className={`w-full mt-2 py-2 px-4 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition disabled:bg-orange-300 disabled:cursor-not-allowed ${
+            isLoading && "opacity-60 cursor-not-allowed"
+          }`}
         >
           {isLoading ? (
             <div className="flex items-center justify-center">Loading...</div>

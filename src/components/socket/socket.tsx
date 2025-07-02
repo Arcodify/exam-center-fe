@@ -20,7 +20,7 @@ function SocketInitialization() {
   const [socketError, setSocketError] = useState<string | null>(null);
   const [_reconnectAttempts, setReconnectAttempts] = useState<number>(0);
 
-  console.log(_reconnectAttempts);
+  
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,7 +54,7 @@ function SocketInitialization() {
     wsRef.current = socket;
 
     socket.onopen = () => {
-      console.log("WebSocket connected");
+     
       setSocketConnected(true);
       setSocketError(null);
       setReconnectAttempts(0);
@@ -72,7 +72,7 @@ function SocketInitialization() {
       try {
         const data = JSON.parse(event.data);
         if (data.type === "status") {
-          console.log("Status update:", data);
+       
           setStatusMsg({
             ...data.data,
             timestamp: data.timestamp || new Date().toISOString(),

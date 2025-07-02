@@ -13,7 +13,6 @@ class LoginService {
         message: "Login successful",
       };
     } catch (error: any) {
-      console.log(error.response.data.message);
       return {
         success: false,
         data: null,
