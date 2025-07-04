@@ -122,7 +122,7 @@ const Questions = () => {
 
   const resetCurrentQuestion = () => {
     const currentQuestion = questions[currentQuestionIndex];
-   
+    answerSubmit(currentQuestion.id, "");
     setQuestions((prev: any) =>
       prev.map((q: any) =>
         q.id === currentQuestion.id
