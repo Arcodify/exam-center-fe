@@ -2,6 +2,7 @@ import ConfirmationModal from "@/components/modal/confirm-modal";
 import QuestionCard from "@/components/question-card";
 import SocketInitialization from "@/components/socket/socket";
 import UserInfo from "@/components/user-info";
+
 import useQuestion from "@/hook/useQuestion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -32,7 +33,6 @@ const Questions = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { questions, setQuestions, fetchQuestions, answerSubmit, sessionEnd } =
     useQuestion();
- 
 
   useEffect(() => {
     fetchQuestions();
@@ -132,7 +132,7 @@ const Questions = () => {
 
   const resetCurrentQuestion = () => {
     const currentQuestion = questions[currentQuestionIndex];
-    console.log(`Resetting question ${currentQuestion.id}`);
+    answerSubmit(currentQuestion.id, "");
     setQuestions((prev: any) =>
       prev.map((q: any) =>
         q.id === currentQuestion.id
@@ -169,7 +169,7 @@ const Questions = () => {
         <div className="flex-1 flex flex-col relative">
           <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-4">
             <div className="max-w-4xl mx-auto">
-            <SocketInitialization />
+              <SocketInitialization />
               <div className="flex items-center justify-between w-full gap-2 mb-10">
                 {instituteData && (
                   <div className="">
@@ -182,8 +182,6 @@ const Questions = () => {
                     />
                   </div>
                 )}
-
-               
 
                 <h1 className="text-lg font-semibold text-slate-900 text-center text-nowrap">
                   {instituteData?.program_name}
