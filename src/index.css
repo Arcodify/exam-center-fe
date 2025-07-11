@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .wrapper {
   @apply max-w-[1600px] mx-auto px-2 sm:px-3 md:px-4 lg:px-5;
@@ -42,7 +44,7 @@
 }
 
 @media (max-width: 1023px) {
-  .sticky-bottom{
+  .sticky-bottom {
     position: fixed;
     bottom: 0;
     left: 0;
