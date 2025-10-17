@@ -32,7 +32,6 @@ const Questions = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { questions, setQuestions, fetchQuestions, answerSubmit, sessionEnd } =
     useQuestion();
- 
 
   useEffect(() => {
     fetchQuestions();
@@ -42,12 +41,9 @@ const Questions = () => {
     const savedData = sessionStorage.getItem("institute-data");
     const parsedData = savedData ? JSON.parse(savedData) : null;
 
-   
-
     setInstituteData(parsedData);
   }, []);
 
-  // Show loading while questions are being fetched
   if (questions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -60,7 +56,6 @@ const Questions = () => {
   }
 
   const handleSelectAnswer = (id: number, answer: string) => {
-   
     answerSubmit(id, answer);
     setQuestions((prev: any) =>
       prev.map((q: any) =>
@@ -85,24 +80,20 @@ const Questions = () => {
     if (currentQuestionIndex < questions.length - 1) {
       const currentQuestion = questions[currentQuestionIndex];
       if (!currentQuestion.is_answered) {
-       
         setSkippedQuestions((prev) => new Set([...prev, currentQuestion.id]));
       }
 
-     
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-     
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
   const handleSubmit = () => {
-   
     setIsModalOpen(true);
   };
 
@@ -143,7 +134,6 @@ const Questions = () => {
   };
 
   const goToQuestion = (index: number) => {
-
     setCurrentQuestionIndex(index);
   };
 
@@ -151,15 +141,13 @@ const Questions = () => {
   const skippedCount = skippedQuestions.size;
   const totalQuestions = questions.length;
 
-
-
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="flex flex-col lg:flex-row min-h-screen">
         <div className="flex-1 flex flex-col relative">
           <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-4">
             <div className="max-w-4xl mx-auto">
-            <SocketInitialization />
+              <SocketInitialization />
               <div className="flex items-center justify-between w-full gap-2 mb-10">
                 {instituteData && (
                   <div className="">
@@ -172,8 +160,6 @@ const Questions = () => {
                     />
                   </div>
                 )}
-
-               
 
                 <h1 className="text-lg font-semibold text-slate-900 text-center text-nowrap">
                   {instituteData?.program_name}

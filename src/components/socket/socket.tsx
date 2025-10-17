@@ -12,6 +12,35 @@ interface StatusMessage {
   timestamp?: string;
 }
 
+interface Question {
+  id: number;
+  question: string;
+  options: string[];
+  student_answer: string | null;
+  is_answered: boolean;
+  answer?: string;
+}
+
+interface WebSocketMessage {
+  type: string;
+  data?: any;
+  message?: string;
+  error?: string;
+  timestamp?: string;
+}
+
+declare global {
+  interface Window {
+    socketService?: {
+      getQuestions: () => boolean;
+      submitAnswer: (question_id: number, selected_answer: string) => boolean;
+      endSession: () => boolean;
+      setQuestionCallbacks: (callbacks: any) => void;
+      isConnected: boolean;
+    };
+  }
+}
+
 function SocketInitialization() {
   const baseURL = import.meta.env.VITE_PRODUCTION_SOCKET_URL;
 
@@ -20,11 +49,17 @@ function SocketInitialization() {
   const [socketError, setSocketError] = useState<string | null>(null);
   const [_reconnectAttempts, setReconnectAttempts] = useState<number>(0);
 
-  
-
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const statusIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Callbacks for parent component
+  const questionCallbacksRef = useRef<{
+    onQuestionsReceived?: (questions: Question[]) => void;
+    onAnswerSubmitted?: (response: any) => void;
+    onSessionEnded?: (response: any) => void;
+    onError?: (error: string, type?: string) => void;
+  }>({});
 
   function getToken(): string | null {
     const storedData = localStorage.getItem("userInfo");
@@ -35,6 +70,36 @@ function SocketInitialization() {
       return null;
     }
   }
+
+  const setQuestionCallbacks = (
+    callbacks: typeof questionCallbacksRef.current
+  ) => {
+    questionCallbacksRef.current = callbacks;
+  };
+
+  const sendWebSocketMessage = (message: any) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(message));
+      return true;
+    }
+    return false;
+  };
+
+  const getQuestions = () => {
+    return sendWebSocketMessage({ type: "get_question_list" });
+  };
+
+  const submitAnswer = (question_id: number, selected_answer: string) => {
+    return sendWebSocketMessage({
+      type: "submit_answer",
+      question_id,
+      selected_answer,
+    });
+  };
+
+  const endSession = () => {
+    return sendWebSocketMessage({ type: "complete_check" });
+  };
 
   const connectWebSocket = () => {
     const token = getToken();
@@ -49,43 +114,124 @@ function SocketInitialization() {
     }
 
     const socket = new WebSocket(
-      `ws://${baseURL}/ws/exam/status/?token=${token}`
+      `ws://${baseURL}/ws/exam/unified/?token=${token}`
     );
     wsRef.current = socket;
 
     socket.onopen = () => {
-     
       setSocketConnected(true);
       setSocketError(null);
       setReconnectAttempts(0);
 
-      socket.send(JSON.stringify({ type: "status" }));
+      // Request initial status
+      socket.send(JSON.stringify({ type: "get_status" }));
 
+      // Set up status polling
       statusIntervalRef.current = setInterval(() => {
         if (socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({ type: "status" }));
+          socket.send(JSON.stringify({ type: "get_status" }));
         }
       }, 10000);
+
+      // Initialize socket service for parent components
+      window.socketService = {
+        getQuestions,
+        submitAnswer,
+        endSession,
+        setQuestionCallbacks,
+        isConnected: true,
+      };
     };
 
     socket.onmessage = (event: MessageEvent) => {
       try {
-        const data = JSON.parse(event.data);
-        if (data.type === "status") {
-       
-          setStatusMsg({
-            ...data.data,
-            timestamp: data.timestamp || new Date().toISOString(),
-          });
+        const data: WebSocketMessage = JSON.parse(event.data);
+
+        switch (data.type) {
+          case "status":
+            setStatusMsg({
+              ...data.data,
+              timestamp: data.timestamp || new Date().toISOString(),
+            });
+            break;
+
+          case "get_question_list":
+            if (data.error) {
+              questionCallbacksRef.current.onError?.(
+                data.error,
+                "get_questions"
+              );
+            } else {
+              questionCallbacksRef.current.onQuestionsReceived?.(
+                data.data || []
+              );
+            }
+            break;
+
+          case "submit_answer":
+            if (data.error) {
+              questionCallbacksRef.current.onError?.(
+                data.error,
+                "submit_answer"
+              );
+            } else {
+              questionCallbacksRef.current.onAnswerSubmitted?.(data);
+            }
+            break;
+
+          case "complete_check":
+            if (data.error) {
+              questionCallbacksRef.current.onError?.(
+                data.error,
+                "complete_check"
+              );
+            } else {
+              questionCallbacksRef.current.onSessionEnded?.(data);
+            }
+            break;
+
+          case "error":
+            questionCallbacksRef.current.onError?.(
+              data.error || "An error occurred",
+              "general"
+            );
+            break;
+
+          default:
+            console.warn("Unknown message type:", data.type);
         }
       } catch (error) {
         console.error("Error parsing message:", error);
+        questionCallbacksRef.current.onError?.(
+          "Failed to parse server response",
+          "parse_error"
+        );
       }
     };
 
-    socket.onerror = () => {
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
       setSocketError("Connection error. Reconnecting...");
       setSocketConnected(false);
+    };
+
+    socket.onclose = (event) => {
+      setSocketConnected(false);
+      if (window.socketService) {
+        window.socketService.isConnected = false;
+      }
+      if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+
+      // Auto-reconnect with exponential backoff
+      if (event.code !== 1000) {
+        const attempts = _reconnectAttempts + 1;
+        setReconnectAttempts(attempts);
+
+        const delay = Math.min(1000 * Math.pow(2, attempts), 30000);
+        reconnectTimerRef.current = setTimeout(() => {
+          connectWebSocket();
+        }, delay);
+      }
     };
   };
 
@@ -95,7 +241,9 @@ function SocketInitialization() {
     return () => {
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
-      if (wsRef.current) wsRef.current.close();
+      if (wsRef.current) {
+        wsRef.current.close(1000, "Component unmounting");
+      }
     };
   }, []);
 
@@ -126,10 +274,11 @@ function SocketInitialization() {
 
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
 
     return `${hours.toString().padStart(2, "0")}:${minutes
       .toString()
-      .padStart(2, "0")} `;
+      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -178,9 +327,10 @@ function SocketInitialization() {
               <div className="p-1.5 bg-blue-100 rounded-lg">
                 <FaClock className="text-blue-600 text-sm" />
               </div>
-              <span>Time Remaining <sub>(Hours:Minutes)</sub></span>
+              <span>
+                Time Remaining <sub>(Hours:Minutes:Seconds)</sub>
+              </span>
             </div>
-          
           </div>
 
           <div className="text-center mb-2">
@@ -193,7 +343,10 @@ function SocketInitialization() {
             <div
               className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-1000"
               style={{
-                width: `${Math.min(100, (statusMsg.time_remaining / 3600) * 100)}%`,
+                width: `${Math.min(
+                  100,
+                  (statusMsg.time_remaining / 3600) * 100
+                )}%`,
               }}
             ></div>
           </div>
