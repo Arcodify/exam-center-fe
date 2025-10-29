@@ -20,7 +20,7 @@ const useQuestion = () => {
   
   const fetchQuestions = async () => {
     try {
-      const response = await questionServices.getQuestions();
+      const response: any = await questionServices.getQuestions();
 
       if (response.success) {
         toast.success(response.message || "Questions fetched successfully");
@@ -39,9 +39,9 @@ const useQuestion = () => {
     }
   };
 
-  const answerSubmit = async (question_id: number, selected_answer: string) => {
+  const answerSubmit: any = async (question_id: number, selected_answer: string) => {
     try {
-      const response = await questionServices.answersubmit(
+      const response: any = await questionServices.answerSubmit(
         question_id,
         selected_answer
       );
@@ -56,7 +56,7 @@ const useQuestion = () => {
   };
 
   const sessionEnd = async () => {
-    const response = await questionServices.sessionEnd();
+    const response: any = await questionServices.sessionEnd();
     if (response.success) {
       toast.success("Session ended successfully");
     } else {
