@@ -172,8 +172,9 @@ function SocketInitialization() {
 
           case "question_list":
             if (data.error) {
+              const errorMsg = data.error ?? data.message ?? "Unknown error";
               questionCallbacksRef.current.onError?.(
-                data.error || data.message,
+                errorMsg,
                 "get_question_list"
               );
             } else {
@@ -185,8 +186,9 @@ function SocketInitialization() {
 
           case "answer_submitted":
             if (data.error) {
+              const errorMsg = data.error ?? data.message ?? "Unknown error";
               questionCallbacksRef.current.onError?.(
-                data.error || data.message,
+                errorMsg,
                 "submit_answer"
               );
             } else {
