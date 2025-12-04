@@ -48,7 +48,7 @@ declare global {
 }
 
 function SocketInitialization() {
-  const baseURL = import.meta.env.VITE_PRODUCTION_SOCKET_URL;
+  const rawSocketHost = import.meta.env.VITE_PRODUCTION_SOCKET_URL;
 
   const [statusMsg, setStatusMsg] = useState<StatusMessage | null>(null);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
@@ -107,6 +107,18 @@ function SocketInitialization() {
     return sendWebSocketMessage({ action: "complete_check" });
   };
 
+  const buildSocketUrl = (token: string) => {
+    const normalizeHost = (host?: string) =>
+      (host || "")
+        .replace(/^https?:\/\//, "")
+        .replace(/^wss?:\/\//, "")
+        .replace(/\/$/, "");
+
+    const host = normalizeHost(rawSocketHost) || window.location.host;
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    return `${protocol}://${host}/ws/exam/unified/?token=${token}`;
+  };
+
   const connectWebSocket = () => {
     const token = getToken();
     if (!token) {
@@ -119,9 +131,8 @@ function SocketInitialization() {
       wsRef.current = null;
     }
 
-    const socket = new WebSocket(
-      `ws://${baseURL}/ws/exam/unified/?token=${token}`
-    );
+    const socketUrl = buildSocketUrl(token);
+    const socket = new WebSocket(socketUrl);
     wsRef.current = socket;
 
     socket.onopen = () => {
