@@ -108,15 +108,26 @@ class QuestionServices {
       }
 
       return new Promise((resolve) => {
+        // WebSocket does not return an explicit "complete_check" response, so
+        // fall back to HTTP after a short grace period to avoid hanging.
+        const httpFallback = setTimeout(async () => {
+          const httpResponse = await this.sessionEndHTTP();
+          resolve(httpResponse);
+        }, 3000);
+
         window.socketService?.setQuestionCallbacks({
-          onSessionEnded: (response: any) =>
+          onSessionEnded: (response: any) => {
+            clearTimeout(httpFallback);
             resolve({
               success: true,
               data: response,
               message: "Session ended via WebSocket",
-            }),
-          onError: (error: string) =>
-            resolve({ success: false, data: null, message: error }),
+            });
+          },
+          onError: (error: string) => {
+            clearTimeout(httpFallback);
+            resolve({ success: false, data: null, message: error });
+          },
         });
       });
     }

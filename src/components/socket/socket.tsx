@@ -10,15 +10,7 @@ interface StatusMessage {
   session_effective_end: string;
   time_remaining: number;
   timestamp?: string;
-}
-
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  student_answer: string | null;
-  is_answered: boolean;
-  answer?: string;
+  event?: any;
 }
 
 interface WebSocketMessage {
@@ -27,6 +19,20 @@ interface WebSocketMessage {
   message?: string;
   error?: string;
   timestamp?: string;
+}
+
+interface Question {
+  id: number;
+  question: string;
+  paragraph?: string | null;
+  marks?: number;
+  negative_marks?: number;
+  answers: {
+    options: string;
+    answer_number: string;
+  }[];
+  student_answer: string | null;
+  is_answered: boolean;
 }
 
 declare global {
@@ -86,19 +92,19 @@ function SocketInitialization() {
   };
 
   const getQuestions = () => {
-    return sendWebSocketMessage({ type: "get_question_list" });
+    return sendWebSocketMessage({ action: "get_question_list" });
   };
 
   const submitAnswer = (question_id: number, selected_answer: string) => {
     return sendWebSocketMessage({
-      type: "submit_answer",
+      action: "submit_answer",
       question_id,
       selected_answer,
     });
   };
 
   const endSession = () => {
-    return sendWebSocketMessage({ type: "complete_check" });
+    return sendWebSocketMessage({ action: "complete_check" });
   };
 
   const connectWebSocket = () => {
@@ -124,12 +130,12 @@ function SocketInitialization() {
       setReconnectAttempts(0);
 
       // Request initial status
-      socket.send(JSON.stringify({ type: "get_status" }));
+      socket.send(JSON.stringify({ action: "get_status" }));
 
       // Set up status polling
       statusIntervalRef.current = setInterval(() => {
         if (socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({ type: "get_status" }));
+          socket.send(JSON.stringify({ action: "get_status" }));
         }
       }, 10000);
 
@@ -153,13 +159,22 @@ function SocketInitialization() {
               ...data.data,
               timestamp: data.timestamp || new Date().toISOString(),
             });
+
+            // Resolve any waiting "end session" callbacks when we see a submitted/completed status
+            if (
+              ["submitted", "completed"].includes(
+                data.data?.status || data.data?.session_status
+              )
+            ) {
+              questionCallbacksRef.current.onSessionEnded?.(data);
+            }
             break;
 
-          case "get_question_list":
+          case "question_list":
             if (data.error) {
               questionCallbacksRef.current.onError?.(
-                data.error,
-                "get_questions"
+                data.error || data.message,
+                "get_question_list"
               );
             } else {
               questionCallbacksRef.current.onQuestionsReceived?.(
@@ -168,10 +183,10 @@ function SocketInitialization() {
             }
             break;
 
-          case "submit_answer":
+          case "answer_submitted":
             if (data.error) {
               questionCallbacksRef.current.onError?.(
-                data.error,
+                data.error || data.message,
                 "submit_answer"
               );
             } else {
@@ -179,20 +194,18 @@ function SocketInitialization() {
             }
             break;
 
-          case "complete_check":
-            if (data.error) {
-              questionCallbacksRef.current.onError?.(
-                data.error,
-                "complete_check"
-              );
-            } else {
-              questionCallbacksRef.current.onSessionEnded?.(data);
-            }
+          case "exam_review":
+          case "paginated_questions":
+            // Add handlers here if the UI needs these responses
+            break;
+
+          case "admin_stats_update":
+            // Admin-only payload; not currently consumed in the candidate UI
             break;
 
           case "error":
             questionCallbacksRef.current.onError?.(
-              data.error || "An error occurred",
+              data.error || data.message || "An error occurred",
               "general"
             );
             break;
