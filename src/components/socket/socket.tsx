@@ -51,6 +51,7 @@ function SocketInitialization() {
   const rawSocketHost = import.meta.env.VITE_PRODUCTION_SOCKET_URL;
 
   const [statusMsg, setStatusMsg] = useState<StatusMessage | null>(null);
+  const [displayTime, setDisplayTime] = useState<number | null>(null);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
   const [socketError, setSocketError] = useState<string | null>(null);
   const [_reconnectAttempts, setReconnectAttempts] = useState<number>(0);
@@ -58,6 +59,7 @@ function SocketInitialization() {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const statusIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Callbacks for parent component
   const questionCallbacksRef = useRef<{
@@ -66,6 +68,13 @@ function SocketInitialization() {
     onSessionEnded?: (response: any) => void;
     onError?: (error: string, type?: string) => void;
   }>({});
+
+  const normalizeTimeRemaining = (time?: number | null) => {
+    if (time === undefined || time === null) return null;
+    const parsed = Number(time);
+    if (Number.isNaN(parsed)) return null;
+    return Math.max(0, Math.floor(parsed));
+  };
 
   function getToken(): string | null {
     const storedData = localStorage.getItem("userInfo");
@@ -165,11 +174,17 @@ function SocketInitialization() {
         const data: WebSocketMessage = JSON.parse(event.data);
 
         switch (data.type) {
-          case "status":
+          case "status": {
             setStatusMsg({
               ...data.data,
               timestamp: data.timestamp || new Date().toISOString(),
             });
+            const normalizedTime = normalizeTimeRemaining(
+              data.data?.time_remaining
+            );
+            if (normalizedTime !== null) {
+              setDisplayTime(normalizedTime);
+            }
 
             // Resolve any waiting "end session" callbacks when we see a submitted/completed status
             if (
@@ -180,6 +195,7 @@ function SocketInitialization() {
               questionCallbacksRef.current.onSessionEnded?.(data);
             }
             break;
+          }
 
           case "question_list":
             if (data.error) {
@@ -267,6 +283,7 @@ function SocketInitialization() {
     return () => {
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
       if (wsRef.current) {
         wsRef.current.close(1000, "Component unmounting");
       }
@@ -278,6 +295,23 @@ function SocketInitialization() {
     setReconnectAttempts(0);
     connectWebSocket();
   };
+
+  useEffect(() => {
+    if (countdownIntervalRef.current)
+      clearInterval(countdownIntervalRef.current);
+
+    countdownIntervalRef.current = setInterval(() => {
+      setDisplayTime((prev) => {
+        if (prev === null) return prev;
+        return Math.max(0, prev - 1);
+      });
+    }, 1000);
+
+    return () => {
+      if (countdownIntervalRef.current)
+        clearInterval(countdownIntervalRef.current);
+    };
+  }, []);
 
   if (
     statusMsg?.status === "submitted" ||
@@ -295,17 +329,21 @@ function SocketInitialization() {
     return <PauseStatus />;
   }
 
-  const formatTimeRemaining = (seconds: number) => {
-    if (!seconds || seconds <= 0) return "00:00:00";
+  const formatTimeRemaining = (seconds?: number | null) => {
+    const totalSeconds = Math.max(0, Math.floor(seconds ?? 0));
+    if (totalSeconds <= 0) return "00:00:00";
 
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
 
     return `${hours.toString().padStart(2, "0")}:${minutes
       .toString()
       .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
+
+  const effectiveTimeRemaining =
+    displayTime ?? normalizeTimeRemaining(statusMsg?.time_remaining) ?? 0;
 
   return (
     <div className="w-full mb-4 py-3 px-4 flex items-center justify-between bg-gradient-to-r from-slate-50 to-blue-50 border border-gray-200 rounded-lg shadow-sm">
@@ -361,7 +399,7 @@ function SocketInitialization() {
 
           <div className="text-center mb-2">
             <div className="text-xl font-mono font-bold text-blue-700 tracking-wider">
-              {formatTimeRemaining(statusMsg.time_remaining)}
+              {formatTimeRemaining(effectiveTimeRemaining)}
             </div>
           </div>
 
@@ -371,7 +409,7 @@ function SocketInitialization() {
               style={{
                 width: `${Math.min(
                   100,
-                  (statusMsg.time_remaining / 3600) * 100
+                  (effectiveTimeRemaining / 3600) * 100
                 )}%`,
               }}
             ></div>

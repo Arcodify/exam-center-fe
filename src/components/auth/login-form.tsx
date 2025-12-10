@@ -12,7 +12,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router";
 import { axiosPublic } from "@/services/axios";
 import toast from "react-hot-toast";
-import logoImage from "@/assets/logo.jpg";
 
 function LoginForm() {
   const [layoutName, setLayoutName] = useState("default");
@@ -119,18 +118,7 @@ function LoginForm() {
         className="w-full bg-white p-8 rounded-xl border border-gray-200 shadow-md space-y-6"
       >
         <div className="flex items-center justify-center gap-2">
-          <img
-            src={
-              initialInstituteData.institute_logo
-                ? initialInstituteData.institute_logo
-                : logoImage
-            }
-            width={400}
-            height={400}
-            alt={`logo for ${initialInstituteData.institute_name}`}
-            className={`w-16 h-16 rounded-full border border-neutral-600/20 overflow-hidden`}
-          />
-          <p className="font-semibold">{initialInstituteData.institute_name}</p>
+          <p className="font-semibold text-xl text-neutral-800">CBT Exam</p>
         </div>
 
         <div className="flex items-center justify-between">
