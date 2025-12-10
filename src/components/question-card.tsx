@@ -34,7 +34,6 @@ const QuestionCard   = ({ questionData, onSelectAnswer }: Props) => {
                 ? "bg-blue-100 border-blue-500 text-blue-900"
                 : "hover:bg-gray-100 border-gray-300"
             }`}
-            disabled={questionData.is_answered}
           >
             <span className="font-bold uppercase mr-2">
               {ans.answer_number}.

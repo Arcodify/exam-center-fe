@@ -111,28 +111,6 @@ const Questions = () => {
     }
   };
 
-  const resetCurrentQuestion = () => {
-    const currentQuestion = questions[currentQuestionIndex];
-    answerSubmit(currentQuestion.id, "");
-    setQuestions((prev: any) =>
-      prev.map((q: any) =>
-        q.id === currentQuestion.id
-          ? {
-              ...q,
-              student_answer: null,
-              is_answered: false,
-            }
-          : q
-      )
-    );
-    // Remove from skipped
-    setSkippedQuestions((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(currentQuestion.id);
-      return newSet;
-    });
-  };
-
   const goToQuestion = (index: number) => {
     setCurrentQuestionIndex(index);
   };
@@ -262,13 +240,6 @@ const Questions = () => {
                   />
                 </svg>
                 Previous
-              </button>
-
-              <button
-                onClick={resetCurrentQuestion}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg text-sm font-medium bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
-              >
-                Reset Answer
               </button>
               <button
                 onClick={() => {
