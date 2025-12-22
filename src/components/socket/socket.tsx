@@ -10,6 +10,8 @@ interface StatusMessage {
   time_remaining: number;
   timestamp?: string;
   event?: any;
+  allow_submission?: boolean;
+  submission_allowed?: boolean;
 }
 
 interface WebSocketMessage {
@@ -46,7 +48,13 @@ declare global {
   }
 }
 
-function SocketInitialization() {
+type SocketInitializationProps = {
+  onSubmissionAllowedChange?: (allowed: boolean) => void;
+};
+
+function SocketInitialization({
+  onSubmissionAllowedChange,
+}: SocketInitializationProps) {
   const rawSocketHost = import.meta.env.VITE_PRODUCTION_SOCKET_URL;
 
   const [statusMsg, setStatusMsg] = useState<StatusMessage | null>(null);
@@ -59,6 +67,7 @@ function SocketInitialization() {
   const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const statusIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSubmissionAllowedRef = useRef<boolean | null>(null);
 
   // Callbacks for parent component
   const questionCallbacksRef = useRef<{
@@ -84,6 +93,14 @@ function SocketInitialization() {
       return null;
     }
   }
+
+  const extractSubmissionAllowed = (data: any) => {
+    if (typeof data?.allow_submission === "boolean")
+      return data.allow_submission;
+    if (typeof data?.submission_allowed === "boolean")
+      return data.submission_allowed;
+    return null;
+  };
 
   const setQuestionCallbacks = (
     callbacks: typeof questionCallbacksRef.current
@@ -178,6 +195,16 @@ function SocketInitialization() {
               ...data.data,
               timestamp: data.timestamp || new Date().toISOString(),
             });
+
+            const submissionAllowed = extractSubmissionAllowed(data.data);
+            if (
+              submissionAllowed !== null &&
+              submissionAllowed !== lastSubmissionAllowedRef.current
+            ) {
+              lastSubmissionAllowedRef.current = submissionAllowed;
+              onSubmissionAllowedChange?.(submissionAllowed);
+            }
+
             const normalizedTime = normalizeTimeRemaining(
               data.data?.time_remaining
             );

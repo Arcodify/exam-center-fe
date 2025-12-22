@@ -17,6 +17,7 @@ type InstituteData = {
   institute_logo: string | null;
   isValidated: boolean;
   isLoadingInstitute: boolean;
+  submission_allowed: boolean;
 };
 
 const Questions = () => {
@@ -30,6 +31,7 @@ const Questions = () => {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionAllowed, setSubmissionAllowed] = useState(false);
   const { questions, setQuestions, fetchQuestions, answerSubmit, sessionEnd } =
     useQuestion();
 
@@ -42,6 +44,7 @@ const Questions = () => {
     const parsedData = savedData ? JSON.parse(savedData) : null;
 
     setInstituteData(parsedData);
+    setSubmissionAllowed(parsedData?.submission_allowed ?? false);
   }, []);
 
   if (questions.length === 0) {
@@ -118,6 +121,16 @@ const Questions = () => {
   const answeredCount = questions.filter((q) => q.is_answered).length;
   const skippedCount = skippedQuestions.size;
   const totalQuestions = questions.length;
+
+  const handleSubmissionAllowedChange = (allowed: boolean) => {
+    setSubmissionAllowed(allowed);
+    setInstituteData((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, submission_allowed: allowed };
+      sessionStorage.setItem("institute-data", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -218,44 +231,55 @@ const Questions = () => {
                   </svg>
                   Previous
                 </button>
-                <button
-                  onClick={() => {
-                    if (currentQuestionIndex === questions.length - 1) {
-                      handleSubmit();
-                    } else {
+
+                {!(currentQuestionIndex === questions.length - 1) && (
+                  <button
+                    onClick={() => {
                       handleNext();
-                    }
-                  }}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
-                >
-                  {currentQuestionIndex === questions.length - 1 ? (
-                    "Submit Exam"
-                  ) : (
-                    <>
-                      Next
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </>
-                  )}
-                </button>
+                    }}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
+                  >
+                    Next
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                )}
+
+                {currentQuestionIndex === questions.length - 1 && (
+                  <button
+                    disabled={!submissionAllowed}
+                    onClick={() => {
+                      handleSubmit();
+                    }}
+                    className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500 ${
+                      !submissionAllowed
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
+                    Submit Exam
+                  </button>
+                )}
               </div>
             </section>
           </div>
         </div>
 
         <aside className="flex flex-col justify-between w-82 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 mx-auto">
-          <SocketInitialization />
+          <SocketInitialization
+            onSubmissionAllowedChange={handleSubmissionAllowedChange}
+          />
 
           <div className="px-4 flex items-center gap-2">
             {instituteData && (

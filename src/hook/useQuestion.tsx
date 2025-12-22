@@ -17,7 +17,7 @@ interface Question {
 const useQuestion = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const navigate = useNavigate();
-  
+
   const fetchQuestions = async () => {
     try {
       const response: any = await questionServices.getQuestions();
@@ -39,14 +39,16 @@ const useQuestion = () => {
     }
   };
 
-  const answerSubmit: any = async (question_id: number, selected_answer: string) => {
+  const answerSubmit: any = async (
+    question_id: number,
+    selected_answer: string
+  ) => {
     try {
       const response: any = await questionServices.answerSubmit(
         question_id,
         selected_answer
       );
       if (response.success) {
-        
       } else {
         toast.error("Failed to submit answer");
       }
