@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import PauseStatus from "../modal/pause-status-modal";
 import SessionEndModal from "../modal/session-end-modal";
-import { FaClock } from "react-icons/fa";
 
 interface StatusMessage {
   status: string;
@@ -214,10 +213,7 @@ function SocketInitialization() {
           case "answer_submitted":
             if (data.error) {
               const errorMsg = data.error ?? data.message ?? "Unknown error";
-              questionCallbacksRef.current.onError?.(
-                errorMsg,
-                "submit_answer"
-              );
+              questionCallbacksRef.current.onError?.(errorMsg, "submit_answer");
             } else {
               questionCallbacksRef.current.onAnswerSubmitted?.(data);
             }
@@ -283,7 +279,8 @@ function SocketInitialization() {
     return () => {
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
-      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      if (countdownIntervalRef.current)
+        clearInterval(countdownIntervalRef.current);
       if (wsRef.current) {
         wsRef.current.close(1000, "Component unmounting");
       }
@@ -346,77 +343,62 @@ function SocketInitialization() {
     displayTime ?? normalizeTimeRemaining(statusMsg?.time_remaining) ?? 0;
 
   return (
-    <div className="w-full mb-4 py-3 px-4 flex items-center justify-between bg-gradient-to-r from-slate-50 to-blue-50 border border-gray-200 rounded-lg shadow-sm">
-      {/* Connection Status */}
-      <div
-        className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm border transition-all duration-300 ${
-          socketConnected
-            ? "bg-green-50 text-green-700 border-green-200 shadow-green-100"
-            : socketError
-            ? "bg-red-50 text-red-700 border-red-200 shadow-red-100"
-            : "bg-yellow-50 text-yellow-700 border-yellow-200 shadow-yellow-100"
-        }`}
-      >
-        <div
-          className={`w-2.5 h-2.5 rounded-full ${
-            socketConnected
-              ? "bg-green-500 animate-pulse"
-              : socketError
-              ? "bg-red-500"
-              : "bg-yellow-500 animate-pulse"
-          }`}
-        ></div>
-        {socketConnected ? (
-          <span className="font-semibold">Connected</span>
-        ) : socketError ? (
-          <>
-            <span className="font-semibold">{socketError}</span>
-            <button
-              onClick={handleManualReconnect}
-              className="ml-2 px-3 py-1 bg-blue-500 text-white text-xs rounded-md hover:bg-blue-600 transition-colors duration-200 font-medium"
-            >
-              Retry
-            </button>
-          </>
-        ) : (
-          <span className="font-semibold">Connecting...</span>
+    <>
+      <div className="p-4">
+        {/* Connection Status */}
+
+        {/* Timer Section */}
+        {statusMsg && (
+          <div className="w-full">
+            <div className="flex items-center gap-2">
+              <section className="mb-2">
+                <div
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    socketConnected
+                      ? "bg-green-500 animate-pulse"
+                      : socketError
+                      ? "bg-red-500"
+                      : "bg-yellow-500 animate-pulse"
+                  }`}
+                ></div>
+                {socketConnected ? (
+                  <span className="font-semibold">{/* Connected */}</span>
+                ) : socketError ? (
+                  <>
+                    {/* <span className="font-semibold">{socketError}</span>
+                    <button
+                      onClick={handleManualReconnect}
+                      className="ml-2 px-3 py-1 bg-blue-500 text-white text-xs rounded-md hover:bg-blue-600 transition-colors duration-200 font-medium"
+                    >
+                      Retry
+                    </button> */}
+                  </>
+                ) : (
+                  <span className="font-semibold">{/* Connecting... */}</span>
+                )}
+              </section>
+
+              <div className="text-center mb-2">
+                <div className="text-xl font-mono font-bold text-blue-700 tracking-wider">
+                  {formatTimeRemaining(effectiveTimeRemaining)}
+                </div>
+              </div>
+            </div>
+            <div className="w-full bg-gray-300 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-1000"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    (effectiveTimeRemaining / 3600) * 100
+                  )}%`,
+                }}
+              ></div>
+            </div>
+          </div>
         )}
       </div>
-
-      {/* Timer Section */}
-      {statusMsg && (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-4 py-3 min-w-[200px]">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2 text-gray-600 text-sm font-semibold">
-              <div className="p-1.5 bg-blue-100 rounded-lg">
-                <FaClock className="text-blue-600 text-sm" />
-              </div>
-              <span>
-                Time Remaining <sub>(Hours:Minutes:Seconds)</sub>
-              </span>
-            </div>
-          </div>
-
-          <div className="text-center mb-2">
-            <div className="text-xl font-mono font-bold text-blue-700 tracking-wider">
-              {formatTimeRemaining(effectiveTimeRemaining)}
-            </div>
-          </div>
-
-          <div className="w-full bg-gray-300 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-1000"
-              style={{
-                width: `${Math.min(
-                  100,
-                  (effectiveTimeRemaining / 3600) * 100
-                )}%`,
-              }}
-            ></div>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 

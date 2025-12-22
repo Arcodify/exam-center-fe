@@ -1,5 +1,5 @@
 import Latex from "react-latex-next";
-import 'katex/dist/katex.min.css';
+import "katex/dist/katex.min.css";
 interface Answer {
   options: string;
   answer_number: string;
@@ -18,12 +18,13 @@ interface Props {
   onSelectAnswer: (id: number, answer: string) => void;
 }
 
-const QuestionCard   = ({ questionData, onSelectAnswer }: Props) => {
+const QuestionCard = ({ questionData, onSelectAnswer }: Props) => {
   return (
-    <div className="bg-white/80    ">
-      <h2 className="text-lg font-semibold    ">
+    <div className="bg-white/80 ">
+      <h2 className="text-lg font-semibold">
         <Latex>{questionData.question}</Latex>
       </h2>
+
       <div className="space-y-2 overflow-y-auto max-h-[300px] py-4">
         {questionData.answers.map((ans) => (
           <button

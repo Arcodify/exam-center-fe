@@ -68,7 +68,6 @@ function LoginForm() {
 
     if (success) {
       navigate("/");
-    } else {
     }
   };
 
@@ -87,7 +86,7 @@ function LoginForm() {
         }));
 
         sessionStorage.setItem("institute-data", JSON.stringify(data));
-      } catch (error: any) {
+      } catch {
         setInitialInstituteData((prev) => ({ ...prev, isValidated: false }));
         toast.error(
           "No exams are currently being conducted. Please check back later!"
@@ -112,15 +111,17 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex flex-col items-center w-full max-w-xl">
+    <div className="flex flex-col items-center w-full">
+      <div className="flex items-center justify-center  gap-2">
+        <p className="text-2xl text-neutral-800 font-bold mb-4">
+          Computer Based Exam Center
+        </p>
+      </div>
+
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full bg-white p-8 rounded-xl border border-gray-200 shadow-md space-y-6"
       >
-        <div className="flex items-center justify-center gap-2">
-          <p className="font-semibold text-xl text-neutral-800">CBT Exam</p>
-        </div>
-
         <div className="flex items-center justify-between">
           <h1 className="font-bold text-2xl text-neutral-800">Login</h1>
 

@@ -23,6 +23,7 @@ interface UserInfo {
   level: Level;
   level_id: number;
   program: Program;
+  subject: Program;
   program_id: number;
   shift_id: number;
   shift_plan_id: number;
@@ -121,7 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(response.message || "Login failed");
         return false;
       }
-    } catch (error:any) {
+    } catch (error: any) {
       const errorMessage = error.message || "Login failed";
       toast.error(errorMessage);
       return false;

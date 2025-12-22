@@ -123,31 +123,8 @@ const Questions = () => {
     <div className="min-h-screen bg-slate-50">
       <div className="flex flex-col lg:flex-row min-h-screen">
         <div className="flex-1 flex flex-col relative">
-          <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-4">
+          <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-6">
             <div className="max-w-4xl mx-auto">
-              <SocketInitialization />
-              <div className="flex items-center justify-between w-full gap-2 mb-10">
-                {instituteData && (
-                  <div className="">
-                    <img
-                      src={instituteData?.institute_logo || ""}
-                      width={48}
-                      height={48}
-                      alt="Institute logo"
-                      className="w-10 h-10 aspect-square rounded-full object-cover border border-slate-200 overflow-hidden shadow"
-                    />
-                  </div>
-                )}
-
-                <h1 className="text-lg font-semibold text-slate-900 text-center text-nowrap">
-                  {instituteData?.program_name}
-                </h1>
-              </div>
-
-              {/* <div className="lg:hidden mb-4 p-3 bg-slate-50 rounded-lg">
-                <UserInfo />
-              </div> */}
-
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-slate-600">
                 <span className="font-medium whitespace-nowrap">
                   Question {currentQuestionIndex + 1} of {totalQuestions}
@@ -170,8 +147,17 @@ const Questions = () => {
           </div>
 
           <div className="flex-1 px-4 md:px-6 py-6 relative">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-white border border-slate-200 rounded-lg p-4 mb-6">
+            <div className="max-w-5xl mx-auto">
+              <div className="bg-white border border-slate-200 rounded-lg p-4 md:p-6 mb-6 ">
+                <QuestionCard
+                  questionData={questions[currentQuestionIndex]}
+                  onSelectAnswer={handleSelectAnswer}
+                />
+              </div>
+            </div>
+
+            <section className="sticky-bottom flex-col">
+              <div className="bg-white border border-slate-200 rounded-lg p-4 mb-2">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div className="text-center">
                     <div className="text-xl sm:text-2xl font-bold text-slate-900">
@@ -207,77 +193,97 @@ const Questions = () => {
                   </div>
                 </div>
               </div>
-
-              <div className="bg-white border border-slate-200 rounded-lg p-4 md:p-6 mb-6 ">
-                <QuestionCard
-                  questionData={questions[currentQuestionIndex]}
-                  onSelectAnswer={handleSelectAnswer}
-                />
-              </div>
-            </div>
-
-            <section className="sticky-bottom">
-              <button
-                onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-                className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  currentQuestionIndex === 0
-                    ? "bg-slate-100 text-white cursor-not-allowed"
-                    : "bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
-                }`}
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="flex items-center gap-4 mb-4">
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentQuestionIndex === 0}
+                  className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    currentQuestionIndex === 0
+                      ? "bg-blue-400 opacity-60 text-white cursor-not-allowed"
+                      : "bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
+                  }`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-                Previous
-              </button>
-              <button
-                onClick={() => {
-                  if (currentQuestionIndex === questions.length - 1) {
-                    handleSubmit();
-                  } else {
-                    handleNext();
-                  }
-                }}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
-              >
-                {currentQuestionIndex === questions.length - 1 ? (
-                  "Submit Exam"
-                ) : (
-                  <>
-                    Next
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </>
-                )}
-              </button>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  Previous
+                </button>
+                <button
+                  onClick={() => {
+                    if (currentQuestionIndex === questions.length - 1) {
+                      handleSubmit();
+                    } else {
+                      handleNext();
+                    }
+                  }}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
+                >
+                  {currentQuestionIndex === questions.length - 1 ? (
+                    "Submit Exam"
+                  ) : (
+                    <>
+                      Next
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </div>
             </section>
           </div>
         </div>
 
         <aside className="flex flex-col justify-between w-82 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 mx-auto">
-          <div className="p-4 pt-10 border-b border-slate-200">
+          <SocketInitialization />
+
+          <div className="px-4 flex items-center gap-2">
+            {instituteData && (
+              <div>
+                <img
+                  src={instituteData?.institute_logo || ""}
+                  width={48}
+                  height={48}
+                  alt="Institute logo"
+                  className="w-10 h-10 aspect-square rounded-full object-cover border border-slate-200 overflow-hidden shadow"
+                />
+              </div>
+            )}
+
+            <h3 className="text-base leading-5 font-semibold text-slate-900 max-w-[26ch]">
+              {instituteData?.institute_name}
+            </h3>
+          </div>
+
+          <div className="px-4 mt-1">
+            {instituteData?.program_name && (
+              <p className="text-slate-600 font-semibold max-w-[32ch]">
+                <span className="">{instituteData?.program_name}</span>
+              </p>
+            )}
+          </div>
+
+          <div className="p-1 border-b border-slate-200">
             <UserInfo />
           </div>
 
@@ -307,21 +313,21 @@ const Questions = () => {
               </div>
             </div>
 
-            <div className="space-y-2 text-xs ">
+            <div className="grid grid-cols-2 text-xs gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-blue-600 rounded"></div>
+                <div className="w-3 h-3 bg-blue-600 rounded"></div>
                 <span className="text-slate-600">Current Question</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-green-700 border border-green-200 rounded"></div>
+                <div className="w-3 h-3 bg-green-700 border border-green-200 rounded"></div>
                 <span className="text-slate-600">Answered</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-red-700 border border-red-200 rounded"></div>
+                <div className="w-3 h-3 bg-red-700 border border-red-200 rounded"></div>
                 <span className="text-slate-600">Skipped</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-slate-100 border border-slate-200 rounded"></div>
+                <div className="w-3 h-3 bg-slate-100 border border-slate-200 rounded"></div>
                 <span className="text-slate-600">Not Attempted</span>
               </div>
             </div>
