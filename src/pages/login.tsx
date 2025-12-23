@@ -3,11 +3,10 @@ import LoginForm from "@/components/auth/login-form";
 const Login = () => {
   return (
     <div className="grid grid-cols-3 min-h-screen gap-2 p-1">
-      <div className="grid place-content-center">
-        <section className="text-[12px]  w-full shadow rounded-lg p-3 ">
+      <div className="pt-[10vh]">
+        <section className="text-[13px] w-full shadow rounded-lg p-3 ">
           <div className="mb-2">
-            <p className="font-bold">Exam Instructions for Students</p>
-            <p className="mb-2 font-bold">(English Version)</p>
+            <p className="font-bold text-lg">Exam Instructions for Students</p>
             <p className="mb-2 font-bold">Dear Students,</p>
             <p className="mb-2">
               Please read and follow these instructions carefully before and
@@ -90,8 +89,8 @@ const Login = () => {
         <LoginForm />
       </div>
 
-      <div className="grid place-content-center">
-        <section className="text-[12px]  w-full shadow rounded-lg p-3 ">
+      <div className="pt-[10vh]">
+        <section className="text-[12px] w-full shadow rounded-lg p-3 ">
           <div className="mb-4">
             <p className="font-bold text-lg mb-2">
               परीक्षा निर्देशिकाहरू: विद्यार्थीहरूका लागि
