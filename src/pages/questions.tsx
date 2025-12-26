@@ -328,17 +328,17 @@ const Questions = () => {
             <UserInfo />
           </div>
 
-          <div className="flex-1 p-4 relative ">
+          <div className="flex-1 px-4 py-2 relative ">
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-slate-900 mb-3">
+              <h3 className="text-sm font-medium text-slate-900 mb-1">
                 Question Navigation
               </h3>
-              <div className="grid grid-cols-6 gap-2 max-h-96 py-1 overflow-y-auto hide-scrollbar">
+              <div className="grid grid-cols-6 gap-1 max-h-96 py-1 overflow-y-auto hide-scrollbar">
                 {questions.map((question, index) => (
                   <button
                     key={question.id}
                     onClick={() => goToQuestion(index)}
-                    className={`w-10 h-10 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
+                    className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
                       index === currentQuestionIndex
                         ? "bg-blue-600 text-white ring-2 ring-blue-200"
                         : question.is_answered
@@ -356,37 +356,37 @@ const Questions = () => {
 
             <div className="text-xs flex flex-col gap-4">
               <div className="pt-4 border-t">
-                <h3 className="text-sm font-medium text-slate-900 mb-4">
+                <h3 className="text-sm font-medium text-slate-900 mb-2">
                   Status Indicators
                 </h3>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-600 rounded"></div>
+                    <div className="w-4 h-4 bg-blue-600 rounded"></div>
                     <span className="text-slate-600">Current Question</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-700 border border-green-200 rounded"></div>
+                    <div className="w-4 h-4 bg-green-700 border border-green-200 rounded"></div>
                     <span className="text-slate-600">Answered</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-700 border border-red-200 rounded"></div>
+                    <div className="w-4 h-4 bg-red-700 border border-red-200 rounded"></div>
                     <span className="text-slate-600">Skipped</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-slate-100 border border-slate-200 rounded"></div>
+                    <div className="w-4 h-4 bg-slate-100 border border-slate-200 rounded"></div>
                     <span className="text-slate-600">Not Attempted</span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t">
-                <h3 className="text-sm font-medium text-slate-900 mb-4">
+              <div className="pt-2 border-t">
+                <h3 className="text-sm font-medium text-slate-900 mb-2">
                   Question Statistics
                   {/* Status Indicators */}
                 </h3>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2  ">
                   <div className="flex items-center gap-2 bg-slate-100 px-2 py-1 rounded-md">
                     <div className="font-bold text-slate-900 w-3 h-3 flex justify-center items-center">
                       {totalQuestions}
