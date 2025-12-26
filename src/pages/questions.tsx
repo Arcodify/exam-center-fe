@@ -119,7 +119,7 @@ const Questions = () => {
   };
 
   const answeredCount = questions.filter((q) => q.is_answered).length;
-  const skippedCount = skippedQuestions.size;
+  // const skippedCount = skippedQuestions.size;
   const totalQuestions = questions.length;
 
   const handleSubmissionAllowedChange = (allowed: boolean) => {
@@ -189,33 +189,9 @@ const Questions = () => {
               </div>
 
               <div className="w-full">
-                <div className="flex items-center gap-2 my-1">
-                  <section>
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        true
-                          ? "bg-green-500 animate-pulse"
-                          : false
-                          ? ""
-                          : "bg-yellow-500 animate-pulse"
-                      }`}
-                    ></div>
-                  </section>
-
-                  <div className="text-center">
-                    <div className="font-mono font-bold text-blue-700 text-sm">
-                      Time Remaining 20:00
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full bg-gray-300 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-1000"
-                    style={{
-                      width: `${Math.min(100, (2000 / 3600) * 100)}%`,
-                    }}
-                  ></div>
-                </div>
+                <SocketInitialization
+                  onSubmissionAllowedChange={handleSubmissionAllowedChange}
+                />
               </div>
             </div>
           </div>
@@ -320,10 +296,6 @@ const Questions = () => {
         </div>
 
         <aside className="flex flex-col justify-between w-82 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 mx-auto">
-          {/* <SocketInitialization
-            onSubmissionAllowedChange={handleSubmissionAllowedChange}
-          /> */}
-
           <div className="p-1 border-b border-slate-200 w-full">
             <UserInfo />
           </div>

@@ -314,11 +314,11 @@ function SocketInitialization({
     };
   }, []);
 
-  const handleManualReconnect = () => {
-    if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-    setReconnectAttempts(0);
-    connectWebSocket();
-  };
+  // const handleManualReconnect = () => {
+  //   if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+  //   setReconnectAttempts(0);
+  //   connectWebSocket();
+  // };
 
   useEffect(() => {
     if (countdownIntervalRef.current)
@@ -405,9 +405,9 @@ function SocketInitialization({
                 )}
               </section>
 
-              <div className="text-center mb-2">
-                <div className="text-xl font-mono font-bold text-blue-700 tracking-wider">
-                  {formatTimeRemaining(effectiveTimeRemaining)}
+              <div className="text-start mb-2">
+                <div className="text-sm font-mono font-bold text-blue-700 ">
+                  Time Remaining: {formatTimeRemaining(effectiveTimeRemaining)}
                 </div>
               </div>
             </div>
