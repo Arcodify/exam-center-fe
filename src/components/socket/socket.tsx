@@ -379,15 +379,17 @@ function SocketInitialization({
           <div className="w-full">
             <div className="flex items-center gap-2">
               <section className="mb-2">
-                <div
-                  className={`w-2.5 h-2.5 rounded-full ${
-                    socketConnected
-                      ? "bg-green-500 animate-pulse"
-                      : socketError
-                      ? "bg-red-500"
-                      : "bg-yellow-500 animate-pulse"
-                  }`}
-                ></div>
+                <div className="fixed top-1 right-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      socketConnected
+                        ? "bg-green-500 animate-pulse"
+                        : socketError
+                        ? "bg-red-500"
+                        : "bg-yellow-500 animate-pulse"
+                    }`}
+                  ></div>
+                </div>
                 {socketConnected ? (
                   <span className="font-semibold">{/* Connected */}</span>
                 ) : socketError ? (
