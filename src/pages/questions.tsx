@@ -119,7 +119,7 @@ const Questions = () => {
   };
 
   const answeredCount = questions.filter((q) => q.is_answered).length;
-  const skippedCount = skippedQuestions.size;
+  // const skippedCount = skippedQuestions.size;
   const totalQuestions = questions.length;
 
   const handleSubmissionAllowedChange = (allowed: boolean) => {
@@ -136,32 +136,89 @@ const Questions = () => {
     <div className="min-h-screen bg-slate-50">
       <div className="flex flex-col lg:flex-row min-h-screen">
         <div className="flex-1 flex flex-col relative">
-          <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-6">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-slate-600">
-                <span className="font-medium whitespace-nowrap">
-                  Question {currentQuestionIndex + 1} of {totalQuestions}
-                </span>
-                <div className="flex-1 bg-slate-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{
-                      width: `${
-                        ((currentQuestionIndex + 1) / totalQuestions) * 100
-                      }%`,
-                    }}
-                  />
+          <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-4 flex items-center justify-between gap-8">
+            {/* Testing UI Navbar */}
+            <div className="flex gap-2 items-center flex-shrink-0">
+              <img
+                src={
+                  instituteData?.institute_logo ||
+                  "https://t4.ftcdn.net/jpg/02/24/86/95/360_F_224869519_aRaeLneqALfPNBzg0xxMZXghtvBXkfIA.jpg"
+                }
+                width={50}
+                height={50}
+                alt="Institute logo"
+                className="w-20 h-20 aspect-square rounded-full object-cover border border-slate-200 overflow-hidden shadow"
+              />
+
+              {/* <div className="flex flex-col leading-5 font-semibold text-lg">
+                <h3>Default</h3>
+                <h3>Institute</h3>
+              </div> */}
+            </div>
+
+            <div className="flex gap-4 max-w-sm w-full">
+              <div className="flex items-center gap-2 w-full">
+                {/* {instituteData && (
+                  <div>
+                    <img
+                      src={
+                        instituteData?.institute_logo ||
+                        "https://t4.ftcdn.net/jpg/02/24/86/95/360_F_224869519_aRaeLneqALfPNBzg0xxMZXghtvBXkfIA.jpg"
+                      }
+                      width={48}
+                      height={48}
+                      alt="Institute logo"
+                      className="w-10 h-10 aspect-square rounded-full object-cover border border-slate-200 overflow-hidden shadow"
+                    />
+                  </div>
+                )} */}
+
+                <div className="flex flex-col">
+                  <h3 className="text-base leading-5 font-semibold text-slate-900 max-w-[26ch]">
+                    {instituteData?.institute_name}
+                  </h3>
+
+                  <div>
+                    {instituteData?.program_name && (
+                      <p className="text-slate-600 font-semibold max-w-[32ch]">
+                        <span className="">{instituteData?.program_name}</span>
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <span className="font-medium whitespace-nowrap">
-                  {answeredCount} answered
-                </span>
+              </div>
+
+              <div className="w-full">
+                <SocketInitialization
+                  onSubmissionAllowedChange={handleSubmissionAllowedChange}
+                />
               </div>
             </div>
           </div>
 
           <div className="flex-1 px-4 md:px-6 py-6 relative">
             <div className="max-w-5xl mx-auto">
-              <div className="bg-white border border-slate-200 rounded-lg p-4 md:p-6 mb-6 ">
+              <div className="mx-auto w-full mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-slate-600">
+                  <span className="font-medium whitespace-nowrap">
+                    Question {currentQuestionIndex + 1} of {totalQuestions}
+                  </span>
+                  <div className="flex-1 bg-slate-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${
+                          ((currentQuestionIndex + 1) / totalQuestions) * 100
+                        }%`,
+                      }}
+                    />
+                  </div>
+                  <span className="font-medium whitespace-nowrap">
+                    {answeredCount} answered
+                  </span>
+                </div>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-lg p-4 md:p-6 mb-6">
                 <QuestionCard
                   questionData={questions[currentQuestionIndex]}
                   onSelectAnswer={handleSelectAnswer}
@@ -170,42 +227,6 @@ const Questions = () => {
             </div>
 
             <section className="sticky-bottom flex-col">
-              <div className="bg-white border border-slate-200 rounded-lg p-4 mb-2">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="text-xl sm:text-2xl font-bold text-slate-900">
-                      {totalQuestions}
-                    </div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wide">
-                      Total
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xl sm:text-2xl font-bold text-green-600">
-                      {answeredCount}
-                    </div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wide">
-                      Answered
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xl sm:text-2xl font-bold text-orange-600">
-                      {totalQuestions - answeredCount - skippedCount}
-                    </div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wide">
-                      Remaining
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xl sm:text-2xl font-bold text-blue-600">
-                      {Math.round((answeredCount / totalQuestions) * 100)}%
-                    </div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wide">
-                      Complete
-                    </div>
-                  </div>
-                </div>
-              </div>
               <div className="flex items-center gap-4 mb-4">
                 <button
                   onClick={handlePrevious}
@@ -263,9 +284,7 @@ const Questions = () => {
                       handleSubmit();
                     }}
                     className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500 ${
-                      !submissionAllowed
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
+                      !submissionAllowed ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
                     Submit Exam
@@ -277,51 +296,21 @@ const Questions = () => {
         </div>
 
         <aside className="flex flex-col justify-between w-82 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 mx-auto">
-          <SocketInitialization
-            onSubmissionAllowedChange={handleSubmissionAllowedChange}
-          />
-
-          <div className="px-4 flex items-center gap-2">
-            {instituteData && (
-              <div>
-                <img
-                  src={instituteData?.institute_logo || ""}
-                  width={48}
-                  height={48}
-                  alt="Institute logo"
-                  className="w-10 h-10 aspect-square rounded-full object-cover border border-slate-200 overflow-hidden shadow"
-                />
-              </div>
-            )}
-
-            <h3 className="text-base leading-5 font-semibold text-slate-900 max-w-[26ch]">
-              {instituteData?.institute_name}
-            </h3>
-          </div>
-
-          <div className="px-4 mt-1">
-            {instituteData?.program_name && (
-              <p className="text-slate-600 font-semibold max-w-[32ch]">
-                <span className="">{instituteData?.program_name}</span>
-              </p>
-            )}
-          </div>
-
-          <div className="p-1 border-b border-slate-200">
+          <div className="p-1 border-b border-slate-200 w-full">
             <UserInfo />
           </div>
 
-          <div className="flex-1 p-4 relative ">
+          <div className="flex-1 px-4 py-2 relative ">
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-slate-900 mb-3">
+              <h3 className="text-sm font-medium text-slate-900 mb-1">
                 Question Navigation
               </h3>
-              <div className="grid grid-cols-6 gap-2 max-h-96 overflow-y-auto hide-x-scrollbar">
+              <div className="grid grid-cols-6 gap-1 max-h-96 py-1 overflow-y-auto hide-scrollbar">
                 {questions.map((question, index) => (
                   <button
                     key={question.id}
                     onClick={() => goToQuestion(index)}
-                    className={`w-10 h-10 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
+                    className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
                       index === currentQuestionIndex
                         ? "bg-blue-600 text-white ring-2 ring-blue-200"
                         : question.is_answered
@@ -337,22 +326,67 @@ const Questions = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 text-xs gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-600 rounded"></div>
-                <span className="text-slate-600">Current Question</span>
+            <div className="text-xs flex flex-col gap-4">
+              <div className="pt-4 border-t">
+                <h3 className="text-sm font-medium text-slate-900 mb-2">
+                  Status Indicators
+                </h3>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-blue-600 rounded"></div>
+                    <span className="text-slate-600">Current Question</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-green-700 border border-green-200 rounded"></div>
+                    <span className="text-slate-600">Answered</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-red-700 border border-red-200 rounded"></div>
+                    <span className="text-slate-600">Skipped</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-slate-100 border border-slate-200 rounded"></div>
+                    <span className="text-slate-600">Not Attempted</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-700 border border-green-200 rounded"></div>
-                <span className="text-slate-600">Answered</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-700 border border-red-200 rounded"></div>
-                <span className="text-slate-600">Skipped</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-slate-100 border border-slate-200 rounded"></div>
-                <span className="text-slate-600">Not Attempted</span>
+
+              <div className="pt-2 border-t">
+                <h3 className="text-sm font-medium text-slate-900 mb-2">
+                  Question Statistics
+                  {/* Status Indicators */}
+                </h3>
+
+                <div className="grid grid-cols-2 gap-2  ">
+                  <div className="flex items-center gap-2 bg-slate-100 px-2 py-1 rounded-md">
+                    <div className="font-bold text-slate-900 w-3 h-3 flex justify-center items-center">
+                      {totalQuestions}
+                    </div>
+                    <span className="text-slate-900">Total</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 bg-green-100 px-2 py-1 rounded-md">
+                    <div className="font-bold text-green-600 flex justify-center items-center">
+                      {answeredCount}
+                    </div>
+                    <span className="text-green-600">Answered</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-orange-100">
+                    <div className="font-bold text-orange-600 flex justify-center items-center">
+                      {Math.round((answeredCount / totalQuestions) * 100)}%
+                    </div>
+                    <span className="text-orange-600">Remaining</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-blue-100">
+                    <div className="font-bold text-blue-600 w-3 h-3 flex justify-center items-center">
+                      {totalQuestions}
+                    </div>
+                    <span className="text-blue-600">Complete</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

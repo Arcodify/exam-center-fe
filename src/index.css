@@ -51,3 +51,15 @@
     width: 100%;
   }
 }
+
+@layer utilities {
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    /* Chrome, Safari, Opera, modern Edge */
+    display: none;
+  }
+}

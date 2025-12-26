@@ -314,11 +314,11 @@ function SocketInitialization({
     };
   }, []);
 
-  const handleManualReconnect = () => {
-    if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-    setReconnectAttempts(0);
-    connectWebSocket();
-  };
+  // const handleManualReconnect = () => {
+  //   if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+  //   setReconnectAttempts(0);
+  //   connectWebSocket();
+  // };
 
   useEffect(() => {
     if (countdownIntervalRef.current)
@@ -379,15 +379,17 @@ function SocketInitialization({
           <div className="w-full">
             <div className="flex items-center gap-2">
               <section className="mb-2">
-                <div
-                  className={`w-2.5 h-2.5 rounded-full ${
-                    socketConnected
-                      ? "bg-green-500 animate-pulse"
-                      : socketError
-                      ? "bg-red-500"
-                      : "bg-yellow-500 animate-pulse"
-                  }`}
-                ></div>
+                <div className="fixed top-1 right-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      socketConnected
+                        ? "bg-green-500 animate-pulse"
+                        : socketError
+                        ? "bg-red-500"
+                        : "bg-yellow-500 animate-pulse"
+                    }`}
+                  ></div>
+                </div>
                 {socketConnected ? (
                   <span className="font-semibold">{/* Connected */}</span>
                 ) : socketError ? (
@@ -405,9 +407,9 @@ function SocketInitialization({
                 )}
               </section>
 
-              <div className="text-center mb-2">
-                <div className="text-xl font-mono font-bold text-blue-700 tracking-wider">
-                  {formatTimeRemaining(effectiveTimeRemaining)}
+              <div className="text-start mb-2">
+                <div className="text-sm font-mono font-bold text-blue-700 ">
+                  Time Remaining: {formatTimeRemaining(effectiveTimeRemaining)}
                 </div>
               </div>
             </div>

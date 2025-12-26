@@ -3,7 +3,7 @@ import LoginForm from "@/components/auth/login-form";
 const Login = () => {
   return (
     <div className="grid grid-cols-3 min-h-screen gap-2 p-1">
-      <div className="pt-[10vh]">
+      <div className="pt-[5vh]">
         <section className="text-[13px] w-full shadow rounded-lg p-3 ">
           <div className="mb-2">
             <p className="font-bold text-lg">Exam Instructions for Students</p>
@@ -89,7 +89,7 @@ const Login = () => {
         <LoginForm />
       </div>
 
-      <div className="pt-[10vh]">
+      <div className="pt-[5vh]">
         <section className="text-[12px] w-full shadow rounded-lg p-3 ">
           <div className="mb-4">
             <p className="font-bold text-lg mb-2">
