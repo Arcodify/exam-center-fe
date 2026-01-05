@@ -114,13 +114,13 @@ function LoginForm() {
     <div className="flex flex-col items-center w-full">
       <div className="flex items-center justify-center  gap-2">
         <p className="text-2xl text-neutral-800 font-bold mb-4">
-          Computer Based Exam Center
+          Computer Based Exam
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full bg-white p-8 rounded-xl border border-gray-200 shadow-md space-y-6"
+        className="w-full bg-white p-8 space-y-6"
       >
         <div className="flex items-center justify-between">
           <h1 className="font-bold text-2xl text-neutral-800">Login</h1>
