@@ -2,9 +2,9 @@ import LoginForm from "@/components/auth/login-form";
 
 const Login = () => {
   return (
-    <div className="grid grid-cols-3 min-h-screen gap-2 p-1">
-      <div className="pt-[5vh]">
-        <section className="text-[13px] w-full shadow-lg rounded-lg p-3 ">
+    <div className="grid grid-cols-2 h-screen gap-2 p-1">
+      <section className="w-full h-auto flex flex-col">
+        <section className="text-[13px] w-full p-3 h-full">
           <h3 className="text-2xl mb-4">
             Instructions and Guidelines for Examinees
           </h3>
@@ -51,14 +51,8 @@ const Login = () => {
           </p>
           Thank you.
         </section>
-      </div>
 
-      <div className="flex items-center justify-center">
-        <LoginForm />
-      </div>
-
-      <div className="pt-[5vh]">
-        <section className="text-[14px] w-full shadow-lg rounded-lg p-3 ">
+        <section className="text-[13px] w-full p-3 h-full">
           <h3 className="text-2xl mb-4">
             परीक्षार्थीहरुको लागि सुझाव तथा निर्देशनहरु
           </h3>
@@ -103,6 +97,10 @@ const Login = () => {
           </p>
           धन्यवाद
         </section>
+      </section>
+
+      <div className="w-full h-full max-w-md mx-auto pr-2 flex justify-center items-center">
+        <LoginForm />
       </div>
     </div>
   );

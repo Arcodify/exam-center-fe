@@ -132,12 +132,13 @@ const Questions = () => {
     });
   };
 
+  console.log(instituteData);
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="flex flex-col lg:flex-row min-h-screen">
         <div className="flex-1 flex flex-col relative">
           <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-4 flex items-center justify-between gap-8">
-            {/* Testing UI Navbar */}
             <div className="flex gap-2 items-center flex-shrink-0">
               <img
                 src={
@@ -149,11 +150,6 @@ const Questions = () => {
                 alt="Institute logo"
                 className="w-20 h-20 aspect-square rounded-full object-cover border border-slate-200 overflow-hidden shadow"
               />
-
-              {/* <div className="flex flex-col leading-5 font-semibold text-lg">
-                <h3>Default</h3>
-                <h3>Institute</h3>
-              </div> */}
             </div>
 
             <div className="flex gap-4 max-w-sm w-full">
@@ -305,7 +301,7 @@ const Questions = () => {
               <h3 className="text-sm font-medium text-slate-900 mb-1">
                 Question Navigation
               </h3>
-              <div className="grid grid-cols-6 gap-1 max-h-96 py-1 overflow-y-auto hide-scrollbar">
+              <div className="grid grid-cols-6 gap-1 max-h-[22rem] py-1 overflow-y-auto hide-scrollbar">
                 {questions.map((question, index) => (
                   <button
                     key={question.id}
