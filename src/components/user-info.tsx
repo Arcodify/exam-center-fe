@@ -8,7 +8,7 @@ const UserInfo = () => {
     symbolNumber: user?.symbol_number,
     photo:
       user?.photo ||
-      "https://t4.ftcdn.net/jpg/02/24/86/95/360_F_224869519_aRaeLneqALfPNBzg0xxMZXghtvBXkfIA.jpg",
+      "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=",
 
     program: user?.program,
     subject: user?.subject,
@@ -24,7 +24,7 @@ const UserInfo = () => {
           <img
             src={userInfo.photo}
             alt="Student"
-            className="w-full h-full rounded-lg object-cover border-2 border-white"
+            className="w-full h-full rounded-lg object-contain border-2 border-white"
           />
         </div>
 

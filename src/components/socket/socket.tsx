@@ -337,6 +337,7 @@ function SocketInitialization({
     if (!socketConnected && countdownIntervalRef.current) {
       clearInterval(countdownIntervalRef.current);
       countdownIntervalRef.current = null;
+      onSubmissionAllowedChange?.(false);
     }
     // Resume countdown when reconnected
     else if (socketConnected && !countdownIntervalRef.current) {
@@ -390,7 +391,6 @@ function SocketInitialization({
   return (
     <>
       <div className="p-4">
-        {/* Connection Status */}
 
         {/* Timer Section */}
         {statusMsg && (
@@ -427,11 +427,6 @@ function SocketInitialization({
               <div className="text-start mb-2">
                 <div className="text-sm font-mono font-bold text-blue-700 ">
                   Time Remaining: {formatTimeRemaining(effectiveTimeRemaining)}
-                  {!socketConnected && (
-                    <span className="ml-2 text-yellow-600 text-sm">
-                      (Paused - Reconnecting...)
-                    </span>
-                  )}
                 </div>
               </div>
             </div>
