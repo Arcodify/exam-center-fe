@@ -314,12 +314,6 @@ function SocketInitialization({
     };
   }, []);
 
-  // const handleManualReconnect = () => {
-  //   if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-  //   setReconnectAttempts(0);
-  //   connectWebSocket();
-  // };
-
   useEffect(() => {
     if (countdownIntervalRef.current)
       clearInterval(countdownIntervalRef.current);
@@ -336,6 +330,30 @@ function SocketInitialization({
         clearInterval(countdownIntervalRef.current);
     };
   }, []);
+
+
+  useEffect(() => {
+    // Stop countdown when disconnected to prevent drift
+    if (!socketConnected && countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    // Resume countdown when reconnected
+    else if (socketConnected && !countdownIntervalRef.current) {
+      countdownIntervalRef.current = setInterval(() => {
+        setDisplayTime((prev) => {
+          if (prev === null) return prev;
+          return Math.max(0, prev - 1);
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+    };
+  }, [socketConnected]);
 
   if (
     statusMsg?.status === "submitted" ||
@@ -381,13 +399,12 @@ function SocketInitialization({
               <section className="mb-2">
                 <div className="fixed top-1 right-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      socketConnected
-                        ? "bg-green-500 animate-pulse"
-                        : socketError
+                    className={`w-2 h-2 rounded-full ${socketConnected
+                      ? "bg-green-500 animate-pulse"
+                      : socketError
                         ? "bg-red-500"
                         : "bg-yellow-500 animate-pulse"
-                    }`}
+                      }`}
                   ></div>
                 </div>
                 {socketConnected ? (
@@ -410,6 +427,11 @@ function SocketInitialization({
               <div className="text-start mb-2">
                 <div className="text-sm font-mono font-bold text-blue-700 ">
                   Time Remaining: {formatTimeRemaining(effectiveTimeRemaining)}
+                  {!socketConnected && (
+                    <span className="ml-2 text-yellow-600 text-sm">
+                      (Paused - Reconnecting...)
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

@@ -64,10 +64,10 @@ const Questions = () => {
       prev.map((q: any) =>
         q.id === id
           ? {
-              ...q,
-              student_answer: answer,
-              is_answered: true,
-            }
+            ...q,
+            student_answer: answer,
+            is_answered: true,
+          }
           : q
       )
     );
@@ -154,20 +154,6 @@ const Questions = () => {
 
             <div className="flex gap-4 max-w-sm w-full">
               <div className="flex items-center gap-2 w-full">
-                {/* {instituteData && (
-                  <div>
-                    <img
-                      src={
-                        instituteData?.institute_logo ||
-                        "https://t4.ftcdn.net/jpg/02/24/86/95/360_F_224869519_aRaeLneqALfPNBzg0xxMZXghtvBXkfIA.jpg"
-                      }
-                      width={48}
-                      height={48}
-                      alt="Institute logo"
-                      className="w-10 h-10 aspect-square rounded-full object-cover border border-slate-200 overflow-hidden shadow"
-                    />
-                  </div>
-                )} */}
 
                 <div className="flex flex-col">
                   <h3 className="text-base leading-5 font-semibold text-slate-900 max-w-[26ch]">
@@ -203,9 +189,8 @@ const Questions = () => {
                     <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                       style={{
-                        width: `${
-                          ((currentQuestionIndex + 1) / totalQuestions) * 100
-                        }%`,
+                        width: `${((currentQuestionIndex + 1) / totalQuestions) * 100
+                          }%`,
                       }}
                     />
                   </div>
@@ -227,11 +212,10 @@ const Questions = () => {
                 <button
                   onClick={handlePrevious}
                   disabled={currentQuestionIndex === 0}
-                  className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    currentQuestionIndex === 0
+                  className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${currentQuestionIndex === 0
                       ? "bg-blue-400 opacity-60 text-white cursor-not-allowed"
                       : "bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
-                  }`}
+                    }`}
                 >
                   <svg
                     className="w-4 h-4"
@@ -279,9 +263,8 @@ const Questions = () => {
                     onClick={() => {
                       handleSubmit();
                     }}
-                    className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500 ${
-                      !submissionAllowed ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500 ${!submissionAllowed ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     Submit Exam
                   </button>
@@ -306,15 +289,14 @@ const Questions = () => {
                   <button
                     key={question.id}
                     onClick={() => goToQuestion(index)}
-                    className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
-                      index === currentQuestionIndex
+                    className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${index === currentQuestionIndex
                         ? "bg-blue-600 text-white ring-2 ring-blue-200"
                         : question.is_answered
-                        ? "bg-green-700 text-slate-100 hover:bg-green-200"
-                        : skippedQuestions.has(question.id)
-                        ? "bg-red-700 text-slate-100 hover:bg-red-200"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
+                          ? "bg-green-700 text-slate-100 hover:bg-green-200"
+                          : skippedQuestions.has(question.id)
+                            ? "bg-red-700 text-slate-100 hover:bg-red-200"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      }`}
                   >
                     {index + 1}
                   </button>
