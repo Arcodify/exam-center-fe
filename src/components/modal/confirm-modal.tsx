@@ -32,7 +32,7 @@ const ConfirmationModal = ({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 overflow-hidden">
+      <div className="relative bg-white rounded-xl max-w-7xl w-full mx-4 overflow-hidden">
         {/* Header */}
         <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -72,28 +72,25 @@ const ConfirmationModal = ({
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-2">
+        <div className="p-4 space-y-2">
           {/* Progress Summary */}
           <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-gray-800 mb-3">Answer Summary</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Total Questions:</span>
-                <span className="font-semibold text-gray-800">
+            <h3 className="font-semibold text-gray-800 mb-2">Answer Summary</h3>
+            <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center py-2 px-3 bg-orange-200 rounded-lg gap-1">
+                <span className="text-sm text-orange-600">Total Questions:</span>
+                <span className="font-semibold text-orange-600">
                   {totalQuestions}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Answered:</span>
-                <div className="flex items-center space-x-2">
-                  <FaCheckCircle className="text-green-500 text-sm" />
-                  <span className="font-semibold text-green-600">
-                    {answeredCount}
-                  </span>
-                </div>
+              <div className="flex justify-between items-center py-2 px-3 bg-green-200 rounded-lg gap-1">
+                <span className="text-sm text-green-600">Answered:</span>
+                <span className="font-semibold text-green-600">
+                  {answeredCount}
+                </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Unanswered:</span>
+              <div className="flex justify-between items-center py-2 px-3 bg-red-200 rounded-lg gap-1">
+                <span className="text-sm text-red-600">Unanswered:</span>
                 <span className="font-semibold text-red-600">
                   {unansweredCount}
                 </span>
