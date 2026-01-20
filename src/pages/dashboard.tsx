@@ -30,6 +30,8 @@ const Dashboard = () => {
     setInstituteData(parsedData);
   }, []);
 
+  console.log(user);
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -50,16 +52,17 @@ const Dashboard = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="">
               <h1 className="text-xl font-semibold text-slate-900">
-                Exam Dashboard
+                Student Information
               </h1>
-              <p className="text-sm text-slate-600 mt-1">
-                Welcome back, {user?.name}
-              </p>
             </div>
 
             {instituteData && (
               <div className="text-center">
-                <div className="flex md:flex-row-reverse items-center gap-4 mt-6  md:mt-0">
+                <div className="flex md:flex-row-reverse items-center gap-2 mt-6  md:mt-0">
+                  <h2 className="text-sm text-slate-500 font-semibold">
+                    {instituteData.institute_name}
+                  </h2>
+
                   <img
                     src={instituteData.institute_logo || ""}
                     width={48}
@@ -67,9 +70,6 @@ const Dashboard = () => {
                     alt="Institute logo"
                     className="w-10 h-10 rounded-full object-cover border border-slate-200"
                   />
-                  <h2 className="text-sm text-slate-500 font-semibold">
-                    {instituteData.institute_name}
-                  </h2>
                 </div>
               </div>
             )}
@@ -86,15 +86,18 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="space-y-3">
                     <div>
-                      <span className="text-slate-500">Symbol Number</span>
-                      <p className="font-medium text-slate-900">
-                        {user?.symbol_number}
-                      </p>
-                    </div>
-                    <div>
                       <span className="text-slate-500">Name</span>
                       <p className="font-medium text-slate-900">{user?.name}</p>
                     </div>
+
+                    <div>
+                      <span className="text-slate-500">Level</span>
+                      <p className="font-medium text-slate-900">
+                        {user?.level?.name || "Not available"}
+                      </p>
+                    </div>
+
+
                     <div>
                       <span className="text-slate-500">Email</span>
                       <p className="font-medium text-slate-900">
@@ -110,9 +113,9 @@ const Dashboard = () => {
                       </p>
                     </div>
                     <div>
-                      <span className="text-slate-500">Level</span>
+                      <span className="text-slate-500">Symbol Number</span>
                       <p className="font-medium text-slate-900">
-                        {user?.level?.name || "Not available"}
+                        {user?.symbol_number}
                       </p>
                     </div>
                     <div>
@@ -197,11 +200,10 @@ const Dashboard = () => {
                     onChange={() => setIsTermsAccepted(!isTermsAccepted)}
                   />
                   <div
-                    className={`w-6 h-6 border-2 rounded-md transition-all flex items-center justify-center ${
-                      isTermsAccepted
-                        ? "bg-orange-600 border-orange-600"
-                        : "border-black group-hover:border-orange-400"
-                    }`}
+                    className={`w-6 h-6 border-2 rounded-md transition-all flex items-center justify-center ${isTermsAccepted
+                      ? "bg-orange-600 border-orange-600"
+                      : "border-black group-hover:border-orange-400"
+                      }`}
                   >
                     {isTermsAccepted && (
                       <svg
@@ -234,11 +236,10 @@ const Dashboard = () => {
                 type="button"
                 disabled={!isTermsAccepted}
                 onClick={() => navigate("/questions")}
-                className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all disabled:cursor-not-allowed ${
-                  isTermsAccepted
-                    ? "bg-orange-600 hover:bg-orange-700 text-white shadow-md"
-                    : "bg-slate-200 text-slate-400"
-                }`}
+                className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all disabled:cursor-not-allowed ${isTermsAccepted
+                  ? "bg-orange-600 hover:bg-orange-700 text-white shadow-md"
+                  : "bg-slate-200 text-slate-400"
+                  }`}
               >
                 {isTermsAccepted
                   ? "Start Exam"

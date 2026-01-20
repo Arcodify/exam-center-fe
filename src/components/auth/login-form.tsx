@@ -111,35 +111,35 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col w-full">
       <div className="flex items-center justify-center  gap-2">
-        <p className="text-2xl text-neutral-800 font-bold mb-4">
-          Computer Based Exam Center
+        <p className="text-3xl text-neutral-800 font-bold mb-4">
+          Computer Based Exam
         </p>
       </div>
-
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full bg-white p-8 rounded-xl border border-gray-200 shadow-md space-y-6"
+        className="w-full space-y-5"
       >
-        <div className="flex items-center justify-between">
-          <h1 className="font-bold text-2xl text-neutral-800">Login</h1>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="font-bold text-2xl text-gray-800">Login</h1>
 
           <div className="button-level flex justify-between items-center">
             <button
               type="button"
               onClick={() => setShowKeyboard(!showKeyboard)}
               disabled={isLoading || !initialInstituteData.isValidated}
-              className="bg-gray-200 text-gray-700 text-xs p-2 rounded mt-2 disabled:cursor-not-allowed"
+              className="bg-gray-200 text-gray-700 text-xs p-2 rounded mt-2 disabled:cursor-not-allowed hover:bg-gray-300 transition"
+              title="Toggle Virtual Keyboard"
             >
-              {showKeyboard ? <FaKeyboard /> : <FaKeyboard color="red" />}
+              {showKeyboard ? <FaKeyboard /> : <FaKeyboard color="#555" />}
             </button>
           </div>
         </div>
 
-        <div className="">
+        <div className="space-y-1">
           <label
-            className="text-xs md:text-sm text-neutral-600 font-semibold mb-2"
+            className="text-sm text-gray-600 font-medium block"
             htmlFor="symbolNo"
           >
             Symbol No.
@@ -148,7 +148,7 @@ function LoginForm() {
             type="text"
             autoComplete="off"
             {...register("symbolNo")}
-            placeholder="Enter your Symbol No."
+            placeholder=""
             value={inputValues.symbolNo}
             onFocus={() => setInputName("symbolNo")}
             onChange={(e) => {
@@ -156,7 +156,7 @@ function LoginForm() {
               setInputValues({ ...inputValues, symbolNo: value });
               setValue("symbolNo", value);
             }}
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:cursor-not-allowed bg-white"
             disabled={!initialInstituteData.isValidated}
           />
           {errors.symbolNo && (
@@ -166,9 +166,9 @@ function LoginForm() {
           )}
         </div>
 
-        <div className="">
+        <div className="space-y-1">
           <label
-            className="text-xs md:text-sm text-neutral-600 font-semibold"
+            className="text-sm text-gray-600 font-medium block"
             htmlFor="password"
           >
             Password
@@ -177,7 +177,7 @@ function LoginForm() {
             <input
               type={showPassword ? "text" : "password"}
               {...register("password")}
-              placeholder="Enter your password"
+              placeholder=""
               value={inputValues.password}
               onFocus={() => setInputName("password")}
               onChange={(e) => {
@@ -185,13 +185,13 @@ function LoginForm() {
                 setInputValues({ ...inputValues, password: value });
                 setValue("password", value);
               }}
-              className="w-full mt-1 px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:cursor-not-allowed bg-white"
               disabled={!initialInstituteData.isValidated}
             />
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-sm text-gray-600"
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 font-medium"
               tabIndex={-1}
             >
               {showPassword ? "Hide" : "Show"}
@@ -208,20 +208,22 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isLoading || !initialInstituteData.isValidated}
-          className={`w-full mt-2 py-2 px-4 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition disabled:bg-orange-300 disabled:cursor-not-allowed ${
-            isLoading && "opacity-60 cursor-not-allowed"
-          }`}
+          className={`w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 active:bg-blue-800 transition transform hover:scale-[1.01] shadow-md disabled:bg-blue-300 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none ${isLoading && "opacity-70 cursor-wait"
+            }`}
         >
           {isLoading ? (
-            <div className="flex items-center justify-center">Loading...</div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              Logging in...
+            </div>
           ) : (
-            "Sign In"
+            "Login"
           )}
         </button>
       </form>
 
       {showKeyboard && (
-        <div className="mt-4 w-full">
+        <div className="mt-4 w-full bg-white p-2 rounded-lg shadow-lg border border-gray-100">
           <Keyboard
             layoutName={layoutName}
             onChange={handleChange}
