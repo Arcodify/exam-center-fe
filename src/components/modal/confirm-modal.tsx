@@ -72,13 +72,15 @@ const ConfirmationModal = ({
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-2 max-h-[55vh] overflow-y-scroll">
           {/* Progress Summary */}
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-gray-50 rounded-lg p-4 ">
             <h3 className="font-semibold text-gray-800 mb-2">Answer Summary</h3>
             <div className="flex justify-between items-center">
               <div className="flex justify-between items-center py-2 px-3 bg-orange-200 rounded-lg gap-1">
-                <span className="text-sm text-orange-600">Total Questions:</span>
+                <span className="text-sm text-orange-600">
+                  Total Questions:
+                </span>
                 <span className="font-semibold text-orange-600">
                   {totalQuestions}
                 </span>

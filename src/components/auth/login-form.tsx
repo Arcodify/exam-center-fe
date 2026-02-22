@@ -1,3 +1,7 @@
+import "react-simple-keyboard/build/css/index.css";
+
+import { useAuth } from "@/context/AuthContext";
+import { axiosPublic } from "@/services/axios";
 import {
   loginSchema,
   type LoginFormValues,
@@ -5,15 +9,17 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaKeyboard } from "react-icons/fa";
-import Keyboard from "react-simple-keyboard";
-import "react-simple-keyboard/build/css/index.css";
-import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router";
-import { axiosPublic } from "@/services/axios";
 import toast from "react-hot-toast";
+import { FaKeyboard } from "react-icons/fa";
+import { useNavigate } from "react-router";
+import Keyboard from "react-simple-keyboard";
 
-function LoginForm() {
+interface props {
+  onEnglishInstructions: (data: string[]) => void;
+  onNepaliInstructions: (data: string[]) => void;
+}
+
+function LoginForm({ onEnglishInstructions, onNepaliInstructions }: props) {
   const [layoutName, setLayoutName] = useState("default");
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -56,7 +62,7 @@ function LoginForm() {
 
   const handleShift = () => {
     setLayoutName((prevLayout) =>
-      prevLayout === "default" ? "shift" : "default"
+      prevLayout === "default" ? "shift" : "default",
     );
   };
 
@@ -85,11 +91,14 @@ function LoginForm() {
           isValidated: true,
         }));
 
+        onEnglishInstructions(data.instructions_english);
+        onNepaliInstructions(data.instructions_nepali);
+
         sessionStorage.setItem("institute-data", JSON.stringify(data));
       } catch {
         setInitialInstituteData((prev) => ({ ...prev, isValidated: false }));
         toast.error(
-          "No exams are currently being conducted. Please check back later!"
+          "No exams are currently being conducted. Please check back later!",
         );
       } finally {
         setInitialInstituteData((prev) => ({
@@ -112,15 +121,12 @@ function LoginForm() {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex items-center justify-center  gap-2">
+      <div className="flex items-center justify-gap-2">
         <p className="text-3xl text-neutral-800 font-bold mb-4">
           Computer Based Exam
         </p>
       </div>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="w-full space-y-5"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-5">
         <div className="flex items-center justify-between mb-2">
           <h1 className="font-bold text-2xl text-gray-800">Login</h1>
 
@@ -208,8 +214,9 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isLoading || !initialInstituteData.isValidated}
-          className={`w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 active:bg-blue-800 transition transform hover:scale-[1.01] shadow-md disabled:bg-blue-300 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none ${isLoading && "opacity-70 cursor-wait"
-            }`}
+          className={`w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 active:bg-blue-800 transition transform hover:scale-[1.01] shadow-md disabled:bg-blue-300 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none ${
+            isLoading && "opacity-70 cursor-wait"
+          }`}
         >
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">

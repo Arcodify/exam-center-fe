@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import PauseStatus from "../modal/pause-status-modal";
 import SessionEndModal from "../modal/session-end-modal";
+import { axiosPrivate } from "@/services/axios";
+import { getPendingAnswers, markAnswerSynced } from "@/utils/examProgress";
 
 interface StatusMessage {
   status: string;
@@ -68,6 +70,7 @@ function SocketInitialization({
   const statusIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastSubmissionAllowedRef = useRef<boolean | null>(null);
+  const syncInProgressRef = useRef(false);
 
   // Callbacks for parent component
   const questionCallbacksRef = useRef<{
@@ -160,6 +163,33 @@ function SocketInitialization({
     const socket = new WebSocket(socketUrl);
     wsRef.current = socket;
 
+    const syncLocalProgressToServer = async () => {
+      if (syncInProgressRef.current) return;
+      syncInProgressRef.current = true;
+
+      try {
+        const pending = getPendingAnswers();
+        if (pending.length === 0) return;
+
+        // Best-effort: submit pending local answers when network is back.
+        // Uses HTTP to avoid interfering with the question callback pipeline.
+        for (const { question_id, selected_answer } of pending) {
+          try {
+            await axiosPrivate.post(`/exam/answer/submit/`, {
+              question_id,
+              selected_answer,
+            });
+            markAnswerSynced(question_id, selected_answer);
+          } catch (err) {
+            // Leave unsynced so it can retry on next reconnect.
+            console.warn("Failed to sync local answer:", { question_id }, err);
+          }
+        }
+      } finally {
+        syncInProgressRef.current = false;
+      }
+    };
+
     socket.onopen = () => {
       setSocketConnected(true);
       setSocketError(null);
@@ -183,6 +213,9 @@ function SocketInitialization({
         setQuestionCallbacks,
         isConnected: true,
       };
+
+      // Flush any locally-cached answers after reconnect.
+      void syncLocalProgressToServer();
     };
 
     socket.onmessage = (event: MessageEvent) => {
