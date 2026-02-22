@@ -52,8 +52,9 @@ function LoginForm({ onEnglishInstructions, onNepaliInstructions }: props) {
   });
 
   const handleChange = (input: string) => {
-    setInputValues((prev) => ({ ...prev, [inputName]: input }));
-    setValue(inputName as keyof LoginFormValues, input);
+    const normalized = inputName === "password" ? input.toUpperCase() : input;
+    setInputValues((prev) => ({ ...prev, [inputName]: normalized }));
+    setValue(inputName as keyof LoginFormValues, normalized);
   };
 
   const onKeyPress = (button: string) => {
@@ -187,11 +188,11 @@ function LoginForm({ onEnglishInstructions, onNepaliInstructions }: props) {
               value={inputValues.password}
               onFocus={() => setInputName("password")}
               onChange={(e) => {
-                const value = e.target.value;
+                const value = e.target.value.toUpperCase();
                 setInputValues({ ...inputValues, password: value });
                 setValue("password", value);
               }}
-              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:cursor-not-allowed bg-white"
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:cursor-not-allowed bg-white uppercase"
               disabled={!initialInstituteData.isValidated}
             />
             <button
