@@ -8,23 +8,13 @@ import {
   markAnswerSynced,
   mergeLocalAnswers,
 } from "@/utils/examProgress";
+import type { ExamQuestion } from "@/utils/examQuestions";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
-interface Question {
-  id: number;
-  question: string;
-  answers: {
-    options: string;
-    answer_number: string;
-  }[];
-  student_answer: string | null;
-  is_answered: boolean;
-}
-
 const useQuestion = () => {
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const navigate = useNavigate();
   const initialSyncDoneRef = useRef(false);
 
@@ -35,13 +25,13 @@ const useQuestion = () => {
       if (!initialSyncDoneRef.current) {
         initialSyncDoneRef.current = true;
         const pending = getPendingAnswers();
-        for (const { question_id, selected_answer } of pending) {
+        for (const { question_id, selected_answers } of pending) {
           try {
             await axiosPrivate.post(`/exam/answer/submit/`, {
               question_id,
-              selected_answer,
+              selected_answers,
             });
-            markAnswerSynced(question_id, selected_answer);
+            markAnswerSynced(question_id, selected_answers);
           } catch {
             // Keep pending for later reconnect retries.
           }
@@ -55,34 +45,28 @@ const useQuestion = () => {
 
         const data = Array.isArray(response.data) ? response.data : [];
         setQuestions(mergeLocalAnswers(data));
-
-        // Don't log questions here - it will still be the old value
-        // The useEffect above will log when it actually updates
       } else {
         navigate("/");
         toast.error(response.message || "Something went wrong");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch questions");
       navigate("/");
     }
   };
 
-  const answerSubmit: any = async (
-    question_id: number,
-    selected_answer: string,
-  ) => {
+  const answerSubmit = async (question_id: number, selected_answers: string[]) => {
     try {
       // Persist locally immediately for refresh/offline resilience.
-      appendAnswerToProgress(question_id, selected_answer);
+      appendAnswerToProgress(question_id, selected_answers);
 
       const response: any = await questionServices.answerSubmit(
         question_id,
-        selected_answer,
+        selected_answers,
       );
       if (response.success) {
         // Mark as synced so reconnect sync doesn't re-send needlessly.
-        markAnswerSynced(question_id, selected_answer);
+        markAnswerSynced(question_id, selected_answers);
       } else {
         console.error("Failed to submit answer");
       }
@@ -106,6 +90,7 @@ const useQuestion = () => {
       toast.error("Failed to end session");
     }
   };
+
   return { questions, setQuestions, fetchQuestions, answerSubmit, sessionEnd };
 };
 

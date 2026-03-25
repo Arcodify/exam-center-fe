@@ -3,6 +3,7 @@ import PauseStatus from "../modal/pause-status-modal";
 import SessionEndModal from "../modal/session-end-modal";
 import { axiosPrivate } from "@/services/axios";
 import { getPendingAnswers, markAnswerSynced } from "@/utils/examProgress";
+import type { ExamQuestion } from "@/utils/examQuestions";
 
 interface StatusMessage {
   status: string;
@@ -24,25 +25,14 @@ interface WebSocketMessage {
   timestamp?: string;
 }
 
-interface Question {
-  id: number;
-  question: string;
-  paragraph?: string | null;
-  marks?: number;
-  negative_marks?: number;
-  answers: {
-    options: string;
-    answer_number: string;
-  }[];
-  student_answer: string | null;
-  is_answered: boolean;
-}
-
 declare global {
   interface Window {
     socketService?: {
       getQuestions: () => boolean;
-      submitAnswer: (question_id: number, selected_answer: string) => boolean;
+      submitAnswer: (
+        question_id: number,
+        selected_answers: string[],
+      ) => boolean;
       endSession: () => boolean;
       setQuestionCallbacks: (callbacks: any) => void;
       isConnected: boolean;
@@ -74,7 +64,7 @@ function SocketInitialization({
 
   // Callbacks for parent component
   const questionCallbacksRef = useRef<{
-    onQuestionsReceived?: (questions: Question[]) => void;
+    onQuestionsReceived?: (questions: ExamQuestion[]) => void;
     onAnswerSubmitted?: (response: any) => void;
     onSessionEnded?: (response: any) => void;
     onError?: (error: string, type?: string) => void;
@@ -106,7 +96,7 @@ function SocketInitialization({
   };
 
   const setQuestionCallbacks = (
-    callbacks: typeof questionCallbacksRef.current
+    callbacks: typeof questionCallbacksRef.current,
   ) => {
     questionCallbacksRef.current = callbacks;
   };
@@ -123,11 +113,11 @@ function SocketInitialization({
     return sendWebSocketMessage({ action: "get_question_list" });
   };
 
-  const submitAnswer = (question_id: number, selected_answer: string) => {
+  const submitAnswer = (question_id: number, selected_answers: string[]) => {
     return sendWebSocketMessage({
       action: "submit_answer",
       question_id,
-      selected_answer,
+      selected_answers,
     });
   };
 
@@ -173,13 +163,13 @@ function SocketInitialization({
 
         // Best-effort: submit pending local answers when network is back.
         // Uses HTTP to avoid interfering with the question callback pipeline.
-        for (const { question_id, selected_answer } of pending) {
+        for (const { question_id, selected_answers } of pending) {
           try {
             await axiosPrivate.post(`/exam/answer/submit/`, {
               question_id,
-              selected_answer,
+              selected_answers,
             });
-            markAnswerSynced(question_id, selected_answer);
+            markAnswerSynced(question_id, selected_answers);
           } catch (err) {
             // Leave unsynced so it can retry on next reconnect.
             console.warn("Failed to sync local answer:", { question_id }, err);
@@ -239,7 +229,7 @@ function SocketInitialization({
             }
 
             const normalizedTime = normalizeTimeRemaining(
-              data.data?.time_remaining
+              data.data?.time_remaining,
             );
             if (normalizedTime !== null) {
               setDisplayTime(normalizedTime);
@@ -248,7 +238,7 @@ function SocketInitialization({
             // Resolve any waiting "end session" callbacks when we see a submitted/completed status
             if (
               ["submitted", "completed"].includes(
-                data.data?.status || data.data?.session_status
+                data.data?.status || data.data?.session_status,
               )
             ) {
               questionCallbacksRef.current.onSessionEnded?.(data);
@@ -261,11 +251,11 @@ function SocketInitialization({
               const errorMsg = data.error ?? data.message ?? "Unknown error";
               questionCallbacksRef.current.onError?.(
                 errorMsg,
-                "get_question_list"
+                "get_question_list",
               );
             } else {
               questionCallbacksRef.current.onQuestionsReceived?.(
-                data.data || []
+                data.data || [],
               );
             }
             break;
@@ -291,7 +281,7 @@ function SocketInitialization({
           case "error":
             questionCallbacksRef.current.onError?.(
               data.error || data.message || "An error occurred",
-              "general"
+              "general",
             );
             break;
 
@@ -302,7 +292,7 @@ function SocketInitialization({
         console.error("Error parsing message:", error);
         questionCallbacksRef.current.onError?.(
           "Failed to parse server response",
-          "parse_error"
+          "parse_error",
         );
       }
     };
@@ -364,7 +354,6 @@ function SocketInitialization({
     };
   }, []);
 
-
   useEffect(() => {
     // Stop countdown when disconnected to prevent drift
     if (!socketConnected && countdownIntervalRef.current) {
@@ -424,7 +413,6 @@ function SocketInitialization({
   return (
     <>
       <div className="p-4">
-
         {/* Timer Section */}
         {statusMsg && (
           <div className="w-full">
@@ -432,12 +420,13 @@ function SocketInitialization({
               <section className="mb-2">
                 <div className="fixed top-1 right-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${socketConnected
-                      ? "bg-green-500 animate-pulse"
-                      : socketError
-                        ? "bg-red-500"
-                        : "bg-yellow-500 animate-pulse"
-                      }`}
+                    className={`w-2 h-2 rounded-full ${
+                      socketConnected
+                        ? "bg-green-500 animate-pulse"
+                        : socketError
+                          ? "bg-red-500"
+                          : "bg-yellow-500 animate-pulse"
+                    }`}
                   ></div>
                 </div>
                 {socketConnected ? (
@@ -469,7 +458,7 @@ function SocketInitialization({
                 style={{
                   width: `${Math.min(
                     100,
-                    (effectiveTimeRemaining / 3600) * 100
+                    (effectiveTimeRemaining / 3600) * 100,
                   )}%`,
                 }}
               ></div>

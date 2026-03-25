@@ -3,6 +3,10 @@ import QuestionCard from "@/components/question-card";
 import SocketInitialization from "@/components/socket/socket";
 import UserInfo from "@/components/user-info";
 import useQuestion from "@/hook/useQuestion";
+import {
+  buildQuestionSelectionState,
+  getNextSelectedAnswers,
+} from "@/utils/examQuestions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -24,11 +28,9 @@ const Questions = () => {
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [skippedQuestions, setSkippedQuestions] = useState<Set<number>>(
-    new Set()
+    new Set(),
   );
-  const [instituteData, setInstituteData] = useState<InstituteData | null>(
-    null
-  );
+  const [instituteData, setInstituteData] = useState<InstituteData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionAllowed, setSubmissionAllowed] = useState(false);
@@ -36,7 +38,7 @@ const Questions = () => {
     useQuestion();
 
   useEffect(() => {
-    fetchQuestions();
+    void fetchQuestions();
   }, []);
 
   useEffect(() => {
@@ -47,42 +49,45 @@ const Questions = () => {
     setSubmissionAllowed(parsedData?.submission_allowed ?? false);
   }, []);
 
-  if (questions.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex items-center gap-2 text-slate-600">
-          <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
-          <span className="text-sm font-medium">Loading questions...</span>
-        </div>
-      </div>
-    );
-  }
-
-  const handleSelectAnswer = (id: number, answer: string) => {
-    answerSubmit(id, answer);
-    setQuestions((prev: any) =>
-      prev.map((q: any) =>
-        q.id === id
+  const handleUpdateAnswers = (id: number, selectedAnswers: string[]) => {
+    setQuestions((prev) =>
+      prev.map((question) =>
+        question.id === id
           ? {
-            ...q,
-            student_answer: answer,
-            is_answered: true,
-          }
-          : q
-      )
+              ...question,
+              ...buildQuestionSelectionState(selectedAnswers),
+            }
+          : question,
+      ),
     );
+
+    void answerSubmit(id, selectedAnswers);
 
     setSkippedQuestions((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(id);
-      return newSet;
+      const next = new Set(prev);
+      if (selectedAnswers.length > 0) {
+        next.delete(id);
+      }
+      return next;
     });
+  };
+
+  const handleSelectAnswer = (id: number, answer: string) => {
+    const question = questions.find((item) => item.id === id);
+    if (!question) return;
+
+    const nextSelectedAnswers = getNextSelectedAnswers(question, answer);
+    handleUpdateAnswers(id, nextSelectedAnswers);
+  };
+
+  const handleClearAnswer = (id: number) => {
+    handleUpdateAnswers(id, []);
   };
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
       const currentQuestion = questions[currentQuestionIndex];
-      if (!currentQuestion.is_answered) {
+      if (currentQuestion.student_answers.length === 0) {
         setSkippedQuestions((prev) => new Set([...prev, currentQuestion.id]));
       }
 
@@ -109,7 +114,6 @@ const Questions = () => {
     } finally {
       setIsSubmitting(false);
       setIsModalOpen(false);
-
       navigate("/thank-you");
     }
   };
@@ -118,8 +122,20 @@ const Questions = () => {
     setCurrentQuestionIndex(index);
   };
 
-  const answeredCount = questions.filter((q) => q.is_answered).length;
-  // const skippedCount = skippedQuestions.size;
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex items-center gap-2 text-slate-600">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600"></div>
+          <span className="text-sm font-medium">Loading questions...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const answeredCount = questions.filter(
+    (question) => question.student_answers.length > 0,
+  ).length;
   const totalQuestions = questions.length;
 
   const handleSubmissionAllowedChange = (allowed: boolean) => {
@@ -134,10 +150,10 @@ const Questions = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="flex flex-col lg:flex-row min-h-screen">
-        <div className="flex-1 flex flex-col relative">
-          <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-4 flex items-center justify-between gap-8">
-            <div className="flex gap-2 items-center flex-shrink-0">
+      <div className="min-h-screen flex flex-col lg:flex-row">
+        <div className="relative flex flex-1 flex-col">
+          <div className="flex items-center justify-between gap-8 border-b border-slate-200 bg-white px-4 py-4 md:px-6">
+            <div className="flex flex-shrink-0 items-center gap-2">
               <img
                 src={
                   instituteData?.institute_logo ||
@@ -146,22 +162,21 @@ const Questions = () => {
                 width={50}
                 height={50}
                 alt="Institute logo"
-                className="w-20 h-20 aspect-square rounded-full object-cover overflow-hidden"
+                className="aspect-square h-20 w-20 rounded-full object-cover overflow-hidden"
               />
             </div>
 
-            <div className="flex gap-4 max-w-sm w-full">
-              <div className="flex items-center gap-2 w-full">
-
+            <div className="flex w-full max-w-sm gap-4">
+              <div className="flex w-full items-center gap-2">
                 <div className="flex flex-col">
-                  <h3 className="text-base leading-5 font-semibold text-slate-900 max-w-[26ch]">
+                  <h3 className="max-w-[26ch] text-base font-semibold leading-5 text-slate-900">
                     {instituteData?.institute_name}
                   </h3>
 
                   <div>
                     {instituteData?.program_name && (
-                      <p className="text-slate-600 font-semibold max-w-[32ch]">
-                        <span className="">{instituteData?.program_name}</span>
+                      <p className="max-w-[32ch] font-semibold text-slate-600">
+                        <span>{instituteData?.program_name}</span>
                       </p>
                     )}
                   </div>
@@ -176,48 +191,52 @@ const Questions = () => {
             </div>
           </div>
 
-          <div className="flex-1 px-4 md:px-6 py-6 relative">
-            <div className="max-w-5xl mx-auto">
-              <div className="mx-auto w-full mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-slate-600">
-                  <span className="font-medium whitespace-nowrap">
+          <div className="relative flex-1 px-4 py-6 md:px-6">
+            <div className="mx-auto max-w-5xl">
+              <div className="mx-auto mb-4 w-full">
+                <div className="flex flex-col gap-2 text-sm text-slate-600 sm:flex-row sm:items-center sm:gap-4">
+                  <span className="whitespace-nowrap font-medium">
                     Question {currentQuestionIndex + 1} of {totalQuestions}
                   </span>
-                  <div className="flex-1 bg-slate-200 rounded-full h-2">
+                  <div className="h-2 flex-1 rounded-full bg-slate-200">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="h-2 rounded-full bg-blue-600 transition-all duration-300"
                       style={{
-                        width: `${((currentQuestionIndex + 1) / totalQuestions) * 100
-                          }%`,
+                        width: `${
+                          ((currentQuestionIndex + 1) / totalQuestions) * 100
+                        }%`,
                       }}
                     />
                   </div>
-                  <span className="font-medium whitespace-nowrap">
+                  <span className="whitespace-nowrap font-medium">
                     {answeredCount} answered
                   </span>
                 </div>
               </div>
-              <div className="bg-white border border-slate-200 rounded-lg p-4 md:p-6 mb-6">
+
+              <div className="mb-6 rounded-lg border border-slate-200 bg-white p-4 md:p-6">
                 <QuestionCard
                   questionIndex={currentQuestionIndex}
                   questionData={questions[currentQuestionIndex]}
                   onSelectAnswer={handleSelectAnswer}
+                  onClearAnswer={handleClearAnswer}
                 />
               </div>
             </div>
 
             <section className="sticky-bottom flex-col">
-              <div className="flex items-center gap-4 mb-4">
+              <div className="mb-4 flex items-center gap-4">
                 <button
                   onClick={handlePrevious}
                   disabled={currentQuestionIndex === 0}
-                  className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${currentQuestionIndex === 0
-                    ? "bg-blue-400 opacity-60 text-white cursor-not-allowed"
-                    : "bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
-                    }`}
+                  className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all sm:w-auto ${
+                    currentQuestionIndex === 0
+                      ? "cursor-not-allowed bg-blue-400 text-white opacity-60"
+                      : "border border-slate-200 bg-blue-400 text-white hover:bg-blue-500"
+                  }`}
                 >
                   <svg
-                    className="w-4 h-4"
+                    className="h-4 w-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -232,16 +251,14 @@ const Questions = () => {
                   Previous
                 </button>
 
-                {!(currentQuestionIndex === questions.length - 1) && (
+                {currentQuestionIndex !== questions.length - 1 && (
                   <button
-                    onClick={() => {
-                      handleNext();
-                    }}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500"
+                    onClick={handleNext}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-blue-400 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 sm:w-auto"
                   >
                     Next
                     <svg
-                      className="w-4 h-4"
+                      className="h-4 w-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -259,11 +276,10 @@ const Questions = () => {
                 {currentQuestionIndex === questions.length - 1 && (
                   <button
                     disabled={!submissionAllowed}
-                    onClick={() => {
-                      handleSubmit();
-                    }}
-                    className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-400 border border-slate-200 text-white hover:bg-blue-500 ${!submissionAllowed ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                    onClick={handleSubmit}
+                    className={`flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-blue-400 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 sm:w-auto ${
+                      !submissionAllowed ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Submit Exam
                   </button>
@@ -273,29 +289,30 @@ const Questions = () => {
           </div>
         </div>
 
-        <aside className="flex flex-col justify-between w-82 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 mx-auto">
-          <div className="p-1 border-b border-slate-200 w-full">
+        <aside className="mx-auto flex w-82 flex-col justify-between border-t border-slate-200 bg-white lg:border-t-0 lg:border-l">
+          <div className="w-full border-b border-slate-200 p-1">
             <UserInfo />
           </div>
 
-          <div className="flex-1 px-4 py-2 relative ">
+          <div className="relative flex-1 px-4 py-2">
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-slate-900 mb-1">
+              <h3 className="mb-1 text-sm font-medium text-slate-900">
                 Question Navigation
               </h3>
-              <div className="grid grid-cols-6 gap-1 max-h-[22rem] py-1 overflow-y-auto hide-scrollbar">
+              <div className="hide-scrollbar grid max-h-[22rem] grid-cols-6 gap-1 overflow-y-auto py-1">
                 {questions.map((question, index) => (
                   <button
                     key={question.id}
                     onClick={() => goToQuestion(index)}
-                    className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${index === currentQuestionIndex
-                      ? "bg-blue-600 text-white ring-2 ring-blue-200"
-                      : question.is_answered
-                        ? "bg-green-700 text-slate-100 hover:bg-green-200"
-                        : skippedQuestions.has(question.id)
-                          ? "bg-red-700 text-slate-100 hover:bg-red-200"
-                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                      }`}
+                    className={`h-8 w-8 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
+                      index === currentQuestionIndex
+                        ? "bg-blue-600 text-white ring-2 ring-blue-200"
+                        : question.student_answers.length > 0
+                          ? "bg-green-700 text-slate-100 hover:bg-green-200"
+                          : skippedQuestions.has(question.id)
+                            ? "bg-red-700 text-slate-100 hover:bg-red-200"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    }`}
                   >
                     {index + 1}
                   </button>
@@ -303,62 +320,64 @@ const Questions = () => {
               </div>
             </div>
 
-            <div className="text-xs flex flex-col gap-4">
-              <div className="pt-4 border-t">
-                <h3 className="text-sm font-medium text-slate-900 mb-2">
+            <div className="flex flex-col gap-4 text-xs">
+              <div className="border-t pt-4">
+                <h3 className="mb-2 text-sm font-medium text-slate-900">
                   Status Indicators
                 </h3>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-blue-600 rounded"></div>
+                    <div className="h-4 w-4 rounded bg-blue-600"></div>
                     <span className="text-slate-600">Current Question</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-700 border border-green-200 rounded"></div>
+                    <div className="h-4 w-4 rounded border border-green-200 bg-green-700"></div>
                     <span className="text-slate-600">Answered</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-700 border border-red-200 rounded"></div>
+                    <div className="h-4 w-4 rounded border border-red-200 bg-red-700"></div>
                     <span className="text-slate-600">Skipped</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-slate-100 border border-slate-200 rounded"></div>
+                    <div className="h-4 w-4 rounded border border-slate-200 bg-slate-100"></div>
                     <span className="text-slate-600">Not Attempted</span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2 border-t">
-                <h3 className="text-sm font-medium text-slate-900 mb-2">
+              <div className="border-t pt-2">
+                <h3 className="mb-2 text-sm font-medium text-slate-900">
                   Question Statistics
-                  {/* Status Indicators */}
                 </h3>
 
-                <div className="grid grid-cols-2 gap-2  ">
-                  <div className="flex items-center gap-2 bg-slate-100 px-2 py-1 rounded-md">
-                    <div className="font-bold text-slate-900 w-3 h-3 flex justify-center items-center">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2 rounded-md bg-slate-100 px-2 py-1">
+                    <div className="flex h-3 w-3 items-center justify-center font-bold text-slate-900">
                       {totalQuestions}
                     </div>
                     <span className="text-slate-900">Total</span>
                   </div>
 
-                  <div className="flex items-center gap-2 bg-green-100 px-2 py-1 rounded-md">
-                    <div className="font-bold text-green-600 flex justify-center items-center">
+                  <div className="flex items-center gap-2 rounded-md bg-green-100 px-2 py-1">
+                    <div className="flex items-center justify-center font-bold text-green-600">
                       {answeredCount}
                     </div>
                     <span className="text-green-600">Answered</span>
                   </div>
 
-                  <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-orange-100">
-                    <div className="font-bold text-orange-600 flex justify-center items-center">
-                      {Math.round((totalQuestions - answeredCount) / totalQuestions * 100)}%
+                  <div className="flex items-center gap-2 rounded-md bg-orange-100 px-2 py-1">
+                    <div className="flex items-center justify-center font-bold text-orange-600">
+                      {Math.round(
+                        ((totalQuestions - answeredCount) / totalQuestions) * 100,
+                      )}
+                      %
                     </div>
                     <span className="text-orange-600">Remaining</span>
                   </div>
 
-                  <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-blue-100">
-                    <div className="font-bold text-blue-600 w-3 h-3 flex justify-center items-center">
+                  <div className="flex items-center gap-2 rounded-md bg-blue-100 px-2 py-1">
+                    <div className="flex h-3 w-3 items-center justify-center font-bold text-blue-600">
                       {skippedQuestions.size}
                     </div>
                     <span className="text-blue-600">Skipped</span>

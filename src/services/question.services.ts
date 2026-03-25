@@ -3,7 +3,7 @@ import { axiosPrivate } from "./axios";
 class QuestionServices {
   async getQuestions() {
     if (window.socketService?.isConnected) {
-      console.log("📡 Using WebSocket for getQuestions");
+      console.log("Using WebSocket for getQuestions");
       const success = window.socketService.getQuestions();
 
       if (!success) {
@@ -13,7 +13,7 @@ class QuestionServices {
 
       return new Promise((resolve) => {
         window.socketService?.setQuestionCallbacks({
-          onQuestionsReceived: (questions: any[]) =>
+          onQuestionsReceived: (questions: unknown[]) =>
             resolve({
               success: true,
               data: questions,
@@ -29,7 +29,7 @@ class QuestionServices {
   }
 
   private async getQuestionsHTTP() {
-    console.warn("⚠️ Using HTTP fallback for getQuestions");
+    console.warn("Using HTTP fallback for getQuestions");
     try {
       const response = await axiosPrivate.get(`/exam/list/questions/`);
       return {
@@ -46,22 +46,22 @@ class QuestionServices {
     }
   }
 
-  async answerSubmit(question_id: number, selected_answer: string) {
+  async answerSubmit(question_id: number, selected_answers: string[]) {
     if (window.socketService?.isConnected) {
-      console.log("📡 Using WebSocket for answerSubmit");
+      console.log("Using WebSocket for answerSubmit");
       const success = window.socketService.submitAnswer(
         question_id,
-        selected_answer
+        selected_answers,
       );
 
       if (!success) {
         console.warn("WebSocket message send failed, falling back to HTTP...");
-        return this.answerSubmitHTTP(question_id, selected_answer);
+        return this.answerSubmitHTTP(question_id, selected_answers);
       }
 
       return new Promise((resolve) => {
         window.socketService?.setQuestionCallbacks({
-          onAnswerSubmitted: (response: any) =>
+          onAnswerSubmitted: (response: unknown) =>
             resolve({
               success: true,
               data: response,
@@ -73,15 +73,18 @@ class QuestionServices {
       });
     }
 
-    return this.answerSubmitHTTP(question_id, selected_answer);
+    return this.answerSubmitHTTP(question_id, selected_answers);
   }
 
-  private async answerSubmitHTTP(question_id: number, selected_answer: string) {
-    console.warn("⚠️ Using HTTP fallback for answerSubmit");
+  private async answerSubmitHTTP(
+    question_id: number,
+    selected_answers: string[],
+  ) {
+    console.warn("Using HTTP fallback for answerSubmit");
     try {
       const response = await axiosPrivate.post(`/exam/answer/submit/`, {
         question_id,
-        selected_answer,
+        selected_answers,
       });
       return {
         success: true,
@@ -99,7 +102,7 @@ class QuestionServices {
 
   async sessionEnd() {
     if (window.socketService?.isConnected) {
-      console.log("📡 Using WebSocket for sessionEnd");
+      console.log("Using WebSocket for sessionEnd");
       const success = window.socketService.endSession();
 
       if (!success) {
@@ -116,7 +119,7 @@ class QuestionServices {
         }, 3000);
 
         window.socketService?.setQuestionCallbacks({
-          onSessionEnded: (response: any) => {
+          onSessionEnded: (response: unknown) => {
             clearTimeout(httpFallback);
             resolve({
               success: true,
@@ -136,7 +139,7 @@ class QuestionServices {
   }
 
   private async sessionEndHTTP() {
-    console.warn("⚠️ Using HTTP fallback for sessionEnd");
+    console.warn("Using HTTP fallback for sessionEnd");
     try {
       const response = await axiosPrivate.post("/exam/session/end/", {});
       return {

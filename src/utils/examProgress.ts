@@ -1,10 +1,17 @@
+import {
+  areSelectedAnswersEqual,
+  buildQuestionSelectionState,
+  normalizeQuestionSelection,
+  normalizeSelectedAnswers,
+} from "./examQuestions";
+
 type InstituteDataLike = {
   session_id?: number | string | null;
 };
 
 type ExamProgressEvent = {
   question_id: number;
-  selected_answer: string;
+  selected_answers: string[];
   at: string;
   synced?: boolean;
 };
@@ -13,8 +20,8 @@ type ExamProgress = {
   v: 1;
   session_id: number | null;
   updated_at: string;
-  answers: Record<string, string>;
-  synced_answers: Record<string, string>;
+  answers: Record<string, string[]>;
+  synced_answers: Record<string, string[]>;
   events: ExamProgressEvent[];
 };
 
@@ -44,6 +51,20 @@ const getSessionId = (): number | null => {
   }
 };
 
+const normalizeAnswerMap = (value: unknown): Record<string, string[]> => {
+  if (!value || typeof value !== "object") return {};
+
+  return Object.fromEntries(
+    Object.entries(value).map(([questionId, answers]) => [
+      questionId,
+      normalizeSelectedAnswers(
+        Array.isArray(answers) ? answers : undefined,
+        typeof answers === "string" ? answers : null,
+      ),
+    ]),
+  );
+};
+
 export const getExamProgressKey = (): string => {
   const sessionId = getSessionId();
   // Never store unscoped progress; session_id is the boundary.
@@ -61,13 +82,24 @@ export const loadExamProgress = (): ExamProgress => {
     v: 1,
     session_id: sessionId,
     updated_at: typeof parsed?.updated_at === "string" ? parsed.updated_at : "",
-    answers:
-      parsed?.answers && typeof parsed.answers === "object" ? (parsed.answers as Record<string, string>) : {},
-    synced_answers:
-      parsed?.synced_answers && typeof parsed.synced_answers === "object"
-        ? (parsed.synced_answers as Record<string, string>)
-        : {},
-    events: Array.isArray(parsed?.events) ? (parsed.events as ExamProgressEvent[]) : [],
+    answers: normalizeAnswerMap(parsed?.answers),
+    synced_answers: normalizeAnswerMap(parsed?.synced_answers),
+    events: Array.isArray(parsed?.events)
+      ? parsed.events.map((event) => ({
+          question_id: Number(event.question_id),
+          selected_answers: normalizeSelectedAnswers(
+            Array.isArray(event.selected_answers)
+              ? event.selected_answers
+              : undefined,
+            typeof (event as { selected_answer?: unknown }).selected_answer ===
+              "string"
+              ? ((event as { selected_answer?: string }).selected_answer ?? null)
+              : null,
+          ),
+          at: typeof event.at === "string" ? event.at : "",
+          synced: Boolean(event.synced),
+        }))
+      : [],
   };
 };
 
@@ -83,14 +115,20 @@ export const persistExamProgress = (progress: ExamProgress) => {
 
 export const appendAnswerToProgress = (
   question_id: number,
-  selected_answer: string,
+  selected_answers: string[],
 ) => {
   const progress = loadExamProgress();
   if (!progress.session_id) return;
   const now = new Date().toISOString();
+  const normalizedAnswers = normalizeSelectedAnswers(selected_answers);
 
-  progress.answers[String(question_id)] = selected_answer;
-  progress.events.push({ question_id, selected_answer, at: now, synced: false });
+  progress.answers[String(question_id)] = normalizedAnswers;
+  progress.events.push({
+    question_id,
+    selected_answers: normalizedAnswers,
+    at: now,
+    synced: false,
+  });
   if (progress.events.length > MAX_EVENTS) {
     progress.events = progress.events.slice(progress.events.length - MAX_EVENTS);
   }
@@ -102,16 +140,19 @@ export const appendAnswerToProgress = (
 export const getPendingAnswers = () => {
   const progress = loadExamProgress();
   if (!progress.session_id) return [];
-  const pending: { question_id: number; selected_answer: string }[] = [];
+  const pending: { question_id: number; selected_answers: string[] }[] = [];
 
-  for (const [questionIdStr, selected_answer] of Object.entries(
-    progress.answers,
-  )) {
+  for (const [questionIdStr, selected_answers] of Object.entries(progress.answers)) {
     const question_id = Number(questionIdStr);
     if (!Number.isFinite(question_id)) continue;
 
-    if (progress.synced_answers[questionIdStr] !== selected_answer) {
-      pending.push({ question_id, selected_answer });
+    if (
+      !areSelectedAnswersEqual(
+        progress.synced_answers[questionIdStr],
+        selected_answers,
+      )
+    ) {
+      pending.push({ question_id, selected_answers });
     }
   }
 
@@ -120,21 +161,22 @@ export const getPendingAnswers = () => {
 
 export const markAnswerSynced = (
   question_id: number,
-  selected_answer: string,
+  selected_answers: string[],
 ) => {
   const progress = loadExamProgress();
   if (!progress.session_id) return;
   const now = new Date().toISOString();
   const key = String(question_id);
+  const normalizedAnswers = normalizeSelectedAnswers(selected_answers);
 
-  progress.synced_answers[key] = selected_answer;
+  progress.synced_answers[key] = normalizedAnswers;
   progress.updated_at = now;
 
   // Also mark any matching events as synced (best-effort).
   for (const event of progress.events) {
     if (
       event.question_id === question_id &&
-      event.selected_answer === selected_answer
+      areSelectedAnswersEqual(event.selected_answers, normalizedAnswers)
     ) {
       event.synced = true;
     }
@@ -171,25 +213,35 @@ export const clearAllExamProgress = () => {
 };
 
 export const mergeLocalAnswers = <
-  T extends { id: number; student_answer: string | null; is_answered: boolean },
+  T extends {
+    id: number;
+    student_answer?: string | null;
+    student_answers?: string[] | null;
+    allows_multiple_answers?: boolean;
+    is_answered?: boolean;
+  },
 >(
   questions: T[],
 ) => {
   const progress = loadExamProgress();
-  if (!progress.answers || Object.keys(progress.answers).length === 0)
-    return questions;
+  const normalizedQuestions = questions.map((question) =>
+    normalizeQuestionSelection(question),
+  );
 
-  return questions.map((q) => {
+  if (!progress.answers || Object.keys(progress.answers).length === 0) {
+    return normalizedQuestions;
+  }
+
+  return normalizedQuestions.map((question) => {
     // Never override answers coming from server.
-    if (q.student_answer) return q;
+    if (question.student_answers.length > 0) return question;
 
-    const localAnswer = progress.answers[String(q.id)];
-    if (!localAnswer) return q;
+    const localAnswers = progress.answers[String(question.id)];
+    if (!localAnswers) return question;
 
     return {
-      ...q,
-      student_answer: localAnswer,
-      is_answered: true,
+      ...question,
+      ...buildQuestionSelectionState(localAnswers),
     };
   });
 };
