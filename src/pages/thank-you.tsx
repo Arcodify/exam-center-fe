@@ -1,3 +1,4 @@
+import UserPhoto from "@/assets/man.png";
 import { useAuth } from "@/context/AuthContext";
 import {
   FaAward,
@@ -14,9 +15,7 @@ const ThankYou = () => {
   const userInfo = {
     name: user?.name || "Not available",
     symbolNumber: user?.symbol_number || "Not available",
-    photo:
-      user?.photo ||
-      "https://t4.ftcdn.net/jpg/02/24/86/95/360_F_224869519_aRaeLneqALfPNBzg0xxMZXghtvBXkfIA.jpg",
+    photo: user?.photo || UserPhoto,
     program: user?.program?.name || "Not available",
     level: user?.level?.name || "Not available",
     duration: user?.duration || "Not available",
@@ -46,8 +45,11 @@ const ThankYou = () => {
           <div className="flex flex-col items-center gap-3">
             <img
               src={userInfo.photo}
-              alt="Student"
+              alt="photo"
               className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-md"
+              onError={(e) => {
+                e.currentTarget.src = UserPhoto;
+              }}
             />
             <div className="text-center">
               <p className="text-lg font-semibold text-gray-800">

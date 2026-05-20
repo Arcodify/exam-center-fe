@@ -1,3 +1,4 @@
+import InstituteLogo from "@/assets/logo.jpg";
 import ConfirmationModal from "@/components/modal/confirm-modal";
 import QuestionCard from "@/components/question-card";
 import SocketInitialization from "@/components/socket/socket";
@@ -155,14 +156,14 @@ const Questions = () => {
           <div className="flex items-center justify-between gap-8 border-b border-slate-200 bg-white px-4 py-4 md:px-6">
             <div className="flex flex-shrink-0 items-center gap-2">
               <img
-                src={
-                  instituteData?.institute_logo ||
-                  "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0="
-                }
+                src={instituteData?.institute_logo || InstituteLogo}
                 width={50}
                 height={50}
-                alt="Institute logo"
+                alt="photo"
                 className="aspect-square h-20 w-20 rounded-full object-cover overflow-hidden"
+                onError={(e) => {
+                  e.currentTarget.src = InstituteLogo;
+                }}
               />
             </div>
 

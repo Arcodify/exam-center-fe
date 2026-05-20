@@ -1,4 +1,5 @@
 import UserPhoto from "@/assets/man.png";
+import InstituteLogo from "@/assets/logo.jpg";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -16,9 +17,16 @@ type InstituteData = {
 };
 
 const Dashboard = () => {
+  const examInstructions = [
+    "प्रश्नहरू बीच जानका लागि Next र Previous बटन प्रयोग गर्नुहोस्।",
+    "दायाँपट्टिको प्यानलमा Question View देखिन्छ भने माथि तपाईंको Progress Bar देखाइन्छ।",
+    "माथिल्लो दायाँ कुनामा बाँकी रहेको Exam Time देखाइन्छ।",
+    "Question View मा: रातो रंगले उत्तर नदिएका प्रश्न, हरियो रंगले उत्तर दिइसकेका प्रश्न, र खाली अवस्थाले अझै प्रयोग नगरिएका प्रश्नहरू जनाउँछ।",
+    "Question View को तल रहेको Exam Indicators ले तपाईंको परीक्षा स्थिति र प्रगतिको छिटो जानकारी दिन्छ।",
+  ];
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [instituteData, setInstituteData] = useState<InstituteData | null>(
-    null
+    null,
   );
   const { user, formatTime } = useAuth();
   const navigate = useNavigate();
@@ -51,9 +59,7 @@ const Dashboard = () => {
           {/* Header */}
           <div className="px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="">
-              <h1 className="text-xl font-semibold text-slate-900">
-                Student Information
-              </h1>
+              <h1 className="text-xl font-semibold text-slate-900">Dashboard</h1>
             </div>
 
             {instituteData && (
@@ -64,11 +70,14 @@ const Dashboard = () => {
                   </h2>
 
                   <img
-                    src={instituteData.institute_logo || ""}
+                    src={instituteData.institute_logo || InstituteLogo}
                     width={48}
                     height={48}
-                    alt="Institute logo"
+                    alt="photo"
                     className="w-10 h-10 rounded-full object-cover border border-slate-200"
+                    onError={(e) => {
+                      e.currentTarget.src = InstituteLogo;
+                    }}
                   />
                 </div>
               </div>
@@ -80,9 +89,6 @@ const Dashboard = () => {
             {/* Student Information */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
-                <h3 className="text-sm font-medium text-slate-900 uppercase tracking-wide">
-                  Student Information
-                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="space-y-3">
                     <div>
@@ -130,15 +136,13 @@ const Dashboard = () => {
 
               {/* Student Photos */}
               <div className="flex flex-col lg:items-center gap-3">
-                <div className="lg:text-center">
-                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                    Student Photo
-                  </span>
-                </div>
                 <img
                   src={user.photo || UserPhoto}
-                  alt="Student"
+                  alt="photo"
                   className="w-24 h-24 rounded-lg object-cover border border-slate-200"
+                  onError={(e) => {
+                    e.currentTarget.src = UserPhoto;
+                  }}
                 />
               </div>
             </div>
@@ -150,37 +154,12 @@ const Dashboard = () => {
               </h3>
               <div className="bg-slate-50 rounded-lg p-4">
                 <ul className="space-y-2 text-sm text-slate-700">
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>
-                      Please read the following instructions carefully before
-                      proceeding
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>
-                      This exam consists of questions designed to test your
-                      understanding
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>
-                      You will have a set amount of time to complete the exam
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>
-                      Ensure you are in a quiet environment free from
-                      distractions
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>Review your answers carefully before submitting</span>
-                  </li>
+                  {examInstructions.map((instruction) => (
+                    <li key={instruction} className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                      <span>{instruction}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -188,7 +167,7 @@ const Dashboard = () => {
             {/* Terms and Start Button */}
             <div className="space-y-6 pt-4 border border-orange-300 bg-orange-50 p-6 rounded-xl shadow-sm animate-fade-in">
               <h3 className="text-lg font-bold text-orange-700 flex items-center gap-2">
-                ⚠️ Please Read & Accept
+                ⚠️ Please Accept
               </h3>
 
               <label className="flex items-start gap-4 cursor-pointer group">
@@ -200,10 +179,11 @@ const Dashboard = () => {
                     onChange={() => setIsTermsAccepted(!isTermsAccepted)}
                   />
                   <div
-                    className={`w-6 h-6 border-2 rounded-md transition-all flex items-center justify-center ${isTermsAccepted
-                      ? "bg-orange-600 border-orange-600"
-                      : "border-black group-hover:border-orange-400"
-                      }`}
+                    className={`w-6 h-6 border-2 rounded-md transition-all flex items-center justify-center ${
+                      isTermsAccepted
+                        ? "bg-orange-600 border-orange-600"
+                        : "border-black group-hover:border-orange-400"
+                    }`}
                   >
                     {isTermsAccepted && (
                       <svg
@@ -221,13 +201,12 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <span className="text-base text-slate-800 font-medium leading-relaxed">
-                  I accept the <strong>terms and conditions</strong> of the exam
-                  and understand all the instructions provided above.
+                  I understand all the instruction provided above.
                 </span>
               </label>
               {instituteData?.start_time && (
                 <div className="text-sm pb-0 mb-0 text-orange-600 font-medium">
-                  ⏳ Exam will start at:{" "}
+                  ⏳ Exam start time:{" "}
                   {new Date(instituteData.start_time).toLocaleTimeString()}
                 </div>
               )}
@@ -243,7 +222,7 @@ const Dashboard = () => {
               >
                 {isTermsAccepted
                   ? "Start Exam"
-                  : "Please accept the terms and conditions"}
+                  : "Please accept"}
               </button>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import UserPhoto from "@/assets/man.png";
 import { useAuth } from "@/context/AuthContext";
 
 const UserInfo = () => {
@@ -6,10 +7,7 @@ const UserInfo = () => {
   const userInfo = {
     name: user?.name || "Not available",
     symbolNumber: user?.symbol_number,
-    photo:
-      user?.photo ||
-      "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=",
-
+    photo: user?.photo || UserPhoto,
     program: user?.program,
     subject: user?.subject,
     level: user?.level,
@@ -23,8 +21,11 @@ const UserInfo = () => {
         <div className="h-24 w-24">
           <img
             src={userInfo.photo}
-            alt="Student"
+            alt="photo"
             className="w-full h-full rounded-lg object-contain border-2 border-white"
+            onError={(e) => {
+              e.currentTarget.src = UserPhoto;
+            }}
           />
         </div>
 

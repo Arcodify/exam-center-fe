@@ -122,11 +122,6 @@ function LoginForm({ onEnglishInstructions, onNepaliInstructions }: props) {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex items-center justify-gap-2">
-        <p className="text-3xl text-neutral-800 font-bold mb-4">
-          Computer Based Exam
-        </p>
-      </div>
       <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-5">
         <div className="flex items-center justify-between mb-2">
           <h1 className="font-bold text-2xl text-gray-800">Login</h1>
