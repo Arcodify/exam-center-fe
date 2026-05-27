@@ -324,7 +324,7 @@ const Questions = () => {
             <div className="flex flex-col gap-4 text-xs">
               <div className="border-t pt-4">
                 <h3 className="mb-2 text-sm font-medium text-slate-900">
-                  Status Indicators
+                  Stats
                 </h3>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -349,7 +349,7 @@ const Questions = () => {
 
               <div className="border-t pt-2">
                 <h3 className="mb-2 text-sm font-medium text-slate-900">
-                  Question Statistics
+                  Statistics
                 </h3>
 
                 <div className="grid grid-cols-2 gap-2">

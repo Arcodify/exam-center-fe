@@ -26,7 +26,7 @@ const Login = () => {
       <section className="w-full lg:w-7/12 flex flex-col bg-white p-6 lg:p-10 h-auto lg:h-full">
         <div className="mb-4">
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-2">
-            <span>आचारसंहिता</span>
+            <span>Code of Conduct / आचारसंहिता</span>
           </h1>
           <div className="h-px bg-gray-200 w-full mt-4" />
         </div>
@@ -35,10 +35,6 @@ const Login = () => {
           <div className="space-y-8">
             {/* NEPALI */}
             <div className="text-sm leading-relaxed">
-              <h3 className="text-lg font-bold mb-4 text-gray-800 border-b border-gray-200 pb-2 inline-block">
-                Nepali
-              </h3>
-
               <div className="space-y-3 pl-2">
                 {nepali.map((item, i) => (
                   <p key={i} className="flex items-start">
@@ -53,10 +49,6 @@ const Login = () => {
 
             {/* ENGLISH */}
             <div className="text-sm leading-relaxed">
-              <h3 className="text-lg font-bold mb-4 text-gray-800 border-b border-gray-200 pb-2 inline-block">
-                English
-              </h3>
-
               <div className="space-y-3 pl-2">
                 {english.map((item, i) => (
                   <p key={i} className="flex items-start">
