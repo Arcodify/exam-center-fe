@@ -58,10 +58,6 @@ const Dashboard = () => {
         <div className="bg-white border border-slate-200 rounded-lg shadow-sm">
           {/* Header */}
           <div className="px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="">
-              <h1 className="text-xl font-semibold text-slate-900">Dashboard</h1>
-            </div>
-
             {instituteData && (
               <div className="text-center">
                 <div className="flex md:flex-row-reverse items-center gap-2 mt-6  md:mt-0">
