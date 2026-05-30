@@ -173,14 +173,6 @@ const Questions = () => {
                   <h3 className="max-w-[26ch] text-base font-semibold leading-5 text-slate-900">
                     {instituteData?.institute_name}
                   </h3>
-
-                  <div>
-                    {instituteData?.program_name && (
-                      <p className="max-w-[32ch] font-semibold text-slate-600">
-                        <span>{instituteData?.program_name}</span>
-                      </p>
-                    )}
-                  </div>
                 </div>
               </div>
 
